@@ -1,9 +1,9 @@
-import Signin from '@/Components/Signin'
+import SignUp from '@/Components/SignUp'
 
 export default function Home(){
   return (
     <div>
-      <Signin />   
+      <SignUp />   
     </div>
   )
 }
