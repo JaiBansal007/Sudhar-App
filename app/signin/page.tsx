@@ -1,9 +1,9 @@
-import Signin from '@/Components/Signin'
-
+"use client";
 export default function Home(){
   return (
     <div>
-      <Signin />   
+         
+      hi
     </div>
   )
 }
