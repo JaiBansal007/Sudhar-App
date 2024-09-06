@@ -26,7 +26,6 @@ const Report: React.FC = () => {
   const [manualAddress, setManualAddress] = useState<string>("");
   const [cameraOn, setCameraOn] = useState<boolean>(false);
   const [formValid, setFormValid] = useState<boolean>(false);
-
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
@@ -34,6 +33,7 @@ const Report: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const URL = "./my_model/";
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -55,22 +55,41 @@ const Report: React.FC = () => {
 
   const startCamera = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then((stream) => {
-          setCameraOn(true);
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        const videoDevices = devices.filter((device) => device.kind === "videoinput");
+        const backCameraDevice = videoDevices.find((device) => device.label.toLowerCase().includes("back"));
 
-          if (videoRef.current) {
-            console.log("Camera access granted.");
-            videoRef.current.srcObject = stream;
-            videoRef.current.play();
-            
-          }
-        })
-        .catch(() => setError("Unable to access the camera."));
+        if (backCameraDevice) {
+          // If a back camera is available, start it
+          navigator.mediaDevices
+            .getUserMedia({ video: { deviceId: backCameraDevice.deviceId } })
+            .then((stream) => {
+              setCameraOn(true);
+              if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+                videoRef.current.play();
+              } 
+            })
+            .catch(() => setError("Unable to access the camera."));
+        } else {
+          setError("No back camera device found."); // Show error if no back camera is available
+        }
+      });
     } else {
       setError("Camera access is not supported by your browser.");
     }
   };
+
+  if(open){
+    startCamera();
+  }
+
+  // useEffect(() => {
+  //   if(open){
+  //     return startCamera();
+  //   }
+    
+  // }, [open]); // Start camera only when the "open" state is true
 
   const captureImage = () => {
     if (videoRef.current && canvasRef.current) {
@@ -226,7 +245,9 @@ const Report: React.FC = () => {
           ) : (
             <button
               type="button"
-              onClick={startCamera}
+              onClick={() => {
+                setOpen(true);
+              }}
               className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold focus:ring-2 focus:ring-blue-600"
             >
               Start Camera
