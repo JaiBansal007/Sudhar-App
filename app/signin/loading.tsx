@@ -1,9 +1,11 @@
-export default function Loading(){
+import Loading from "@/Components/Loading";
+
+
+export default function hello() {
     return (
         <div>
-        <h1>Loading...</h1>
-        
+            <Loading/>
         </div>
     )
-}   
+}
 
