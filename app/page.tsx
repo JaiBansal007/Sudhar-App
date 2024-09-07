@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import Navbar from '@/components/Navbar'; // Import Navbar
-import Footer from '@/components/Footer'; // Import Footer
+import Navbar from '@/Components/Navbar'; // Import Navbar
+import Footer from '@/Components/Footer'; // Import Footer
+import Chatbot from '@/Components/Chatbot'; // Import Chatbot
 import app, { auth, db } from "@/firebase/config"; // Import Firebase config
 import { collection, getDocs, getFirestore } from 'firebase/firestore'; // Import Firestore
 import { useRouter } from "next/navigation"; // Import Next.js router
@@ -82,6 +83,9 @@ const Home: React.FC = () => {
 
       {/* FAQ Section */}
       <FAQSection />
+
+      {/* Chatbot */}
+      <Chatbot />
 
       {/* Footer */}
       <Footer />
