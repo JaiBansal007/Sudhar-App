@@ -55,9 +55,9 @@ const Report: React.FC = () => {
   }, []);
 
   const removeImage = (index: number) => {
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-  };
-  
+  setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+};
+
 
   const startCamera = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {

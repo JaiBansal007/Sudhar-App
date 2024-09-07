@@ -1,7 +1,7 @@
 export default function Transaction(){
     return (
       <div>
-        Transacation page
+        Transaction page
       </div>
     )
   }
