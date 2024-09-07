@@ -19,6 +19,7 @@ export default function Signin(){
         password: password,
         id: res.user.uid,
         orders: [],
+        complaint: [],
         balance: 0,
       });
       await setDoc(doc(db, "post", res.user.uid), {
@@ -39,6 +40,7 @@ export default function Signin(){
         password:"",
         id: res.user.uid,
         orders: [],
+        complaint: [],
         balance: 0,
       });
       await setDoc(doc(db, "post", res.user.uid), {

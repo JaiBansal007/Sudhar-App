@@ -1,41 +1,39 @@
-"use client";
-
+"use client"
 import { auth, db } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
-import { set } from 'firebase/database';
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 const Wallet: React.FC = () => {
   const [showPopup, setShowPopup] = useState<boolean>(false);
-  const [userId,setuserId]=useState("");
+  const [userId, setUserId] = useState("");
   const [selectedCoin, setSelectedCoin] = useState<number | null>(null);
   const router = useRouter();
-  const [coin,setcoin] =useState(0);
-  const transactions = [
-    { date: "2024-09-01", description: "Bought 0.1 BTC", amount: "-$3,000" },
-    { date: "2024-09-05", description: "Sold 1 ETH", amount: "+$1,500" },
-    { date: "2024-09-10", description: "Transfer to Wallet", amount: "-$500" },
-  ];
-  // Sample data
+  const [coin, setCoin] = useState(0);
+  const [transactions, setTransactions] = useState([]); 
+  
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setuserId(user.uid);
+        setUserId(user.uid);
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
   
         if (userSnap.exists()) {
           const fetchedBalance = userSnap.data().balance;
-          setcoin(fetchedBalance);
+          const fetchedTransactions = userSnap.data().orders || [];
+          setCoin(fetchedBalance);
+
+          // Sort transactions by time (most recent first) and slice to get the last 3 transactions
+          const sortedTransactions = fetchedTransactions.sort((a, b) => new Date(b.time) - new Date(a.time));
+          setTransactions(sortedTransactions);
         }
       } else {
         router.push("/login");
       }
     });
-  }, []);
-
+  }, [router]);
 
   const handleCoinClick = (coin: number) => {
     setSelectedCoin(coin);
@@ -55,38 +53,39 @@ const Wallet: React.FC = () => {
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Available Coins</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div
-                
-                className="bg-blue-500 text-white flex justify-center p-4 rounded-lg shadow-md cursor-pointer hover:bg-blue-600"
-                onClick={() => handleCoinClick(coin)}
-              >
-                <p className="text-lg font-bold">{coin}</p>
-              </div>
+            <div
+              className="bg-blue-500 text-white flex justify-center p-4 rounded-lg shadow-md cursor-pointer hover:bg-blue-600"
+              onClick={() => handleCoinClick(coin)}
+            >
+              <p className="text-lg font-bold">{coin}</p>
+            </div>
           </div>
         </div>
 
         {/* Transactions Section */}
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Past Transactions</h3>
-          <div className="bg-white rounded-lg shadow-md overflow-x-auto">
-            <table className="w-full min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {transactions.map((transaction, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.date}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.description}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{transaction.amount}</td>
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="overflow-y-scroll" style={{ maxHeight: '16rem' }}>
+              <table className="w-full min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {transactions.map((transaction, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.time.substring(0, 10)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.voucherName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{transaction.voucherPrice}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Toaster, toast } from 'react-hot-toast';
 import { auth, db } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { arrayUnion, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 const TransactionPage = () => {
   const searchParams = useSearchParams();
@@ -44,12 +44,6 @@ const TransactionPage = () => {
     if (finalBalance >= 0) {
       toast.success('Transaction Successfully Completed!');
 
-      // Redirect to home page after 2 seconds (only if mounted)
-      if (isMounted) {
-        setTimeout(() => {
-          router.push('/');
-        }, 2000);
-      }
     } else {
       toast.error('Insufficient Balance!');
     }
@@ -66,10 +60,17 @@ const TransactionPage = () => {
           await updateDoc(user,{
             balance:currentbalance,
           });
+          await updateDoc(user,{
+            orders:arrayUnion({
+              time:new Date().toISOString(),
+              voucherName:voucherName,
+              voucherPrice:voucherPrice
+            })
+          })
     }
     setBalance(updatedBalance);
     setFinalBalance(updatedBalance);
-    router.push('/');
+    router.push('/wallet');
   };
 
   if (!isMounted) {

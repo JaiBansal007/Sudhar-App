@@ -33,7 +33,7 @@ const Profile: React.FC = () => {
         setLoading(false);
       }
     };
-
+    
     if (showComplaints) {
       fetchComplaints();
     }

@@ -30,6 +30,7 @@ export default function SignUp(){
           password: password,
           id: res.user.uid,
           orders: [],
+          complaint: [],
           balance: 0,
         });
 
@@ -52,6 +53,7 @@ export default function SignUp(){
         password:"",
         id: res.user.uid,
         orders: [],
+        complaint: [],
         balance: 0,
       });
       await setDoc(doc(db, "post", res.user.uid), {
