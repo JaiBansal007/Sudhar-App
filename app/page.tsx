@@ -98,7 +98,7 @@ const HeroSection: React.FC = () => {
   return (
     <section
       className="relative bg-cover bg-center h-[70vh] flex items-center justify-center"
-      style={{ backgroundImage: 'url(/hero-image.jpg)' }}
+      style={{ backgroundImage: 'url(/1.png)' }}
     >
       <div className="absolute inset-0 bg-black opacity-50"></div>
       <div className="relative z-10 text-center">
