@@ -1,5 +1,69 @@
+"use client";
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { createUserWithEmailAndPassword ,GoogleAuthProvider, signInWithPopup} from 'firebase/auth';
+import { auth, db } from '@/firebase/config';
+import { doc, setDoc } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+const googleauthprovider=new GoogleAuthProvider();
 export default function SignUp(){
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [match, setMatch] = useState(true);
+  const router = useRouter();
+  useEffect(() => {
+    if(password!==confirmPassword){
+      setMatch(false);
+    }else{
+      setMatch(true);
+    }
+  }, [confirmPassword]);
+    const handler = async () => {
+    console.log(email, password);
+    if(match){
+      try {
+        const res=await createUserWithEmailAndPassword(auth,email, password);
+        await setDoc(doc(db, "users", res.user.uid), {
+          email: email,
+          password: password,
+          id: res.user.uid,
+          orders: [],
+          balance: 0,
+        });
+
+        await setDoc(doc(db, "post", res.user.uid), {
+          userpost: [],
+        });
+        toast.success("Successfully Logged in");
+        router.push("/profile");
+      } catch (error) {
+        toast.error("Invalid Credentials");
+      }
+    }
+  };
+  const googleregister = async () => {
+    try {
+      const res = await signInWithPopup(auth, googleauthprovider);
+      console.log(res);
+      await setDoc(doc(db, "users", res.user.uid), {
+        email: res.user.email,
+        password:"",
+        id: res.user.uid,
+        orders: [],
+        balance: 0,
+      });
+      await setDoc(doc(db, "post", res.user.uid), {
+        userpost: [],
+      });
+      toast.success("Successfully Logged in");
+      router.push("/profile");
+    } catch (error) {
+      toast.error("Login Failed");
+      console.log(error);
+    }
+  };
     return (
       <div>
         <section className="bg-gray-50 dark:bg-gray-900">
@@ -12,28 +76,33 @@ export default function SignUp(){
               </h1>
               <form className="space-y-4 md:space-y-6" action="#">
                   <div>
-                      <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                      <input type="email" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required=""/>
+                      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
+                      <input onChange={(e)=>{
+                        setEmail(e.target.value);
+                        }} type="email" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required/>
                   </div>
                   <div>
-                      <label for="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                      <input type="password" name="password" id="password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required=""/>
+                      <label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                      <input onChange={(e)=>setPassword(e.target.value)}type="password" name="password" id="password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required/>
                   </div>
                   <div>
-                      <label for="confirm-password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
-                      <input type="confirm-password" name="confirm-password" id="confirm-password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required=""/>
+                      <label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
+                      <input onChange={(e)=>setConfirmPassword(e.target.value)} type="confirm-password" name="confirm-password" id="confirm-password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required/>
                   </div>
+                  {!match && <p className="text-red-500 text-sm font-light">Passwords do not match</p>}
                   <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="terms" aria-describedby="terms" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required=""/>
+                        <input id="terms" aria-describedby="terms" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required/>
                       </div>
                       <div className="ml-3 text-sm">
-                        <label for="terms" className="font-light text-gray-500 dark:text-gray-300">I accept the <a className="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">Terms and Conditions</a></label>
+                        <label className="font-light text-gray-500 dark:text-gray-300">I accept the <a className="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">Terms and Conditions</a></label>
                       </div>
                   </div>
-                  <button type="submit" className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Create an account</button>
+                  <button onClick={()=>{
+                    handler();
+                  }} type="button" className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Create an account</button>
                   <div className="space-x-6 flex justify-center mt-6">
-            <button type="button" className="border-none outline-none">
+            <button onClick={googleregister} type="button" className="border-none outline-none">
               <svg xmlns="http://www.w3.org/2000/svg" width="32px" className="inline" viewBox="0 0 512 512">
                 <path fill="#fbbd00" d="M120 256c0-25.367 6.989-49.13 19.131-69.477v-86.308H52.823C18.568 144.703 0 198.922 0 256s18.568 111.297 52.823 155.785h86.308v-86.308C126.989 305.13 120 281.367 120 256z" data-original="#fbbd00" />
                 <path fill="#0f9d58" d="m256 392-60 60 60 60c57.079 0 111.297-18.568 155.785-52.823v-86.216h-86.216C305.044 385.147 281.181 392 256 392z" data-original="#0f9d58" />
@@ -43,8 +112,7 @@ export default function SignUp(){
                 <path fill="#eb4132" d="M325.477 139.131C305.13 126.989 281.367 120 256 120s-49.13 6.989-69.477 19.131L100.215 52.823C143.703 18.568 197.922 0 256 0v120c25.181 0 49.044 6.853 69.477 19.131z" data-original="#eb4132" />
               </svg>
             </button>
-
-            <button type="button" className="border-none outline-none">
+            <button onClick={googleregister} type="button" className="border-none outline-none">
               <svg xmlns="http://www.w3.org/2000/svg" width="32px" className="inline" viewBox="0 0 512 512">
                 <path fill="#1877f2" d="M512 256C512 114.616 397.384 0 256 0S0 114.616 0 256c0 128.13 93.223 234.395 214 252.92v-178.32h-64.599V256H214v-58.54c0-63.928 38.146-99.19 96.512-99.19 28.021 0 57.353 5 57.353 5v63.031h-32.309c-31.835 0-41.796 19.771-41.796 40.059V256h71.125l-11.367 74.6H294.76v178.32C415.555 490.395 512 384.13 512 256z" data-original="#1877f2" />
                 <path fill="#fff" d="M353.126 330.6 364.493 256H293.36v-49.64c0-20.288 9.961-40.059 41.795-40.059h32.309V103.27s-29.333-5-57.353-5c-58.366 0-96.512 35.262-96.512 99.19V256h-64.599v74.6h64.599v178.32a259.895 259.895 0 0 0 80 0V330.6z" data-original="#ffffff" />
