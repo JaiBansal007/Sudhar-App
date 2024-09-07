@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import Link from 'next/link';
 import * as tmImage from '@teachablemachine/image';
 
 interface PredictionResult {
@@ -313,7 +312,6 @@ const Report: React.FC = () => {
             onChange={(e) => setManualAddress(e.target.value)}
           />
         </div>
-        <Link href="/order">
           <button
             type="button"
             onClick={handleSubmit}
@@ -324,7 +322,6 @@ const Report: React.FC = () => {
           >
             Submit Complaint
           </button>
-        </Link>
       </div>
     </div>
   );
