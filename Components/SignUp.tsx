@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { createUserWithEmailAndPassword ,GoogleAuthProvider, signInWithPopup} from 'firebase/auth';
 import { auth, db } from '@/firebase/config';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 const googleauthprovider=new GoogleAuthProvider();
@@ -47,18 +47,28 @@ export default function SignUp(){
   const googleregister = async () => {
     try {
       const res = await signInWithPopup(auth, googleauthprovider);
-      console.log(res);
-      await setDoc(doc(db, "users", res.user.uid), {
-        email: res.user.email,
-        password:"",
-        id: res.user.uid,
-        orders: [],
-        complaint: [],
-        balance: 0,
-      });
-      await setDoc(doc(db, "post", res.user.uid), {
-        userpost: [],
-      });
+      const userId = res.user.uid;
+  
+      // Check if user already exists
+      const userDocRef = doc(db, "users", userId);
+      const userSnap = await getDoc(userDocRef);
+  
+      if (!userSnap.exists()) {
+        // User does not exist, create the user document
+        await setDoc(userDocRef, {
+          email: res.user.email,
+          password: "", // Store empty password or remove if not needed
+          id: userId,
+          orders: [],
+          complaint: [],
+          balance: 0,
+        });
+  
+        await setDoc(doc(db, "post", userId), {
+          userpost: [],
+        });
+      }
+  
       toast.success("Successfully Logged in");
       router.push("/profile");
     } catch (error) {

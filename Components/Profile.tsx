@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
-
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/firebase/config";
+import { useRouter } from "next/navigation";
 interface Complaint {
   id: string;
   title: string;
@@ -19,9 +21,20 @@ const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"all" | "active" | "resolved">(
     "all"
   );
-
+  const router = useRouter();
+  const [User, setUser] = useState<any>(null);
   useEffect(() => {
     // Fetch complaints from API
+   const fetchdetials = async () => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        console.log(user);
+        setUser(user.email);
+      }else{
+        router.push("/signin");
+      }
+    });
+    };
     const fetchComplaints = async () => {
       try {
         setLoading(true);
@@ -33,7 +46,7 @@ const Profile: React.FC = () => {
         setLoading(false);
       }
     };
-    
+    fetchdetials();
     if (showComplaints) {
       fetchComplaints();
     }
@@ -67,10 +80,8 @@ const Profile: React.FC = () => {
 
           {/* Profile Information */}
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900">User</h1>
-            <p className="text-sm text-gray-600">user@nsut.ac.in</p>
-            <p className="text-sm text-gray-600">+91 9999999999</p>
-            <p className="text-sm text-gray-600">Nsut Dwarka</p>
+            <h1 className="text-2xl font-bold text-gray-900">{auth.currentUser?.displayName||"User"}</h1>
+            <p className="text-sm text-gray-600">{User}</p>
           </div>
 
           {/* Action Buttons */}
@@ -81,6 +92,15 @@ const Profile: React.FC = () => {
                 className="w-full bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-600 focus:ring-2 focus:ring-blue-500"
               >
                 Wallet
+              </button>
+            </Link>
+            <Link href="/signin">
+              <button
+                onClick={() => auth.signOut()}
+                type="button"
+                className="w-full bg-slate-500 text-white mt-4 py-2 rounded-lg font-semibold hover:bg-slate-800 focus:ring-2 focus:ring-blue-500"
+              >
+                Logout
               </button>
             </Link>
             <button

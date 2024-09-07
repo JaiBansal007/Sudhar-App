@@ -107,7 +107,7 @@ export default function Community() {
               <p className="text-gray-700 leading-tight mb-4 text-xl">{post.description}</p>
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center">
-                  <span className="text-gray-800 font-semibold">{post.author}</span>
+                  <span className="text-gray-800 font-semibold">{"User"}</span>
                 </div>
                 <span className="text-gray-600">{post.createdAt}</span>
               </div>

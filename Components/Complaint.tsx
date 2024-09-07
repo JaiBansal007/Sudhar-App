@@ -4,6 +4,9 @@ import axios from 'axios';
 import * as tmImage from '@teachablemachine/image';
 import {toast} from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import { arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '@/firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
 interface PredictionResult {
   text: string;
   color: string;
@@ -31,7 +34,7 @@ const Report: React.FC = () => {
   const router=useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
+  const [userID,setuserID]=useState("");
   const URL = "./my_model/";
   const [open, setOpen] = useState(false);
 
@@ -62,7 +65,7 @@ const Report: React.FC = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices.enumerateDevices().then((devices) => {
         const videoDevices = devices.filter((device) => device.kind === "videoinput");
-        const backCameraDevice = videoDevices.find((device) => device.label.toLowerCase().includes("back"));
+        const backCameraDevice = videoDevices.find((device) => device.label.toLowerCase().includes(""));
 
         if (backCameraDevice) {
           // If a back camera is available, start it
@@ -201,8 +204,28 @@ const Report: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     if (formValid) {
+      await onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setuserID(user.uid);
+        }else{
+          router.push("/signin");
+        }
+      });
+      const user=doc(db,"users",userID);
+    const usersnap=await getDoc(user);
+    if(usersnap.exists()){
+          await updateDoc(user,{
+            complaint:arrayUnion({
+              time:new Date().toISOString(),
+              title:title,
+              description:description, 
+              location:address,
+              completed:false,
+            })
+          });
+    }
       toast.success("Complaint submitted successfully.");
       router.push("/");
     } else {

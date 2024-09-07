@@ -5,7 +5,7 @@ import {useRouter} from 'next/navigation'
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, db } from '@/firebase/config';
 import {toast} from 'react-toastify';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 const googleauth=new GoogleAuthProvider();
 export default function Signin(){
   const [email, setEmail] = useState("");
@@ -14,45 +14,44 @@ export default function Signin(){
   const signinusingemail=async()=>{
     try {
       const res=await signInWithEmailAndPassword(auth,email, password);
-      await setDoc(doc(db, "users", res.user.uid), {
-        email: email,
-        password: password,
-        id: res.user.uid,
-        orders: [],
-        complaint: [],
-        balance: 0,
-      });
-      await setDoc(doc(db, "post", res.user.uid), {
-        userpost: [],
-      });
       toast.success("Successfully Logged in");
       router.push("/profile");
     } catch (error) {
       toast.error("Invalid Credentials");
     }
   }
-  const signinwithgoogle=async ()=>{
+  const signinwithgoogle = async () => {
     try {
       const res = await signInWithPopup(auth, googleauth);
-      console.log(res);
-      await setDoc(doc(db, "users", res.user.uid), {
-        email: res.user.email,
-        password:"",
-        id: res.user.uid,
-        orders: [],
-        complaint: [],
-        balance: 0,
-      });
-      await setDoc(doc(db, "post", res.user.uid), {
-        userpost: [],
-      });
+      const userId = res.user.uid;
+  
+      // Check if user already exists
+      const userDocRef = doc(db, "users", userId);
+      const userSnap = await getDoc(userDocRef);
+  
+      if (!userSnap.exists()) {
+        // User does not exist, create the user document
+        await setDoc(userDocRef, {
+          email: res.user.email,
+          password: "", // Store empty password or remove if not needed
+          id: userId,
+          orders: [],
+          complaint: [],
+          balance: 0,
+        });
+  
+        await setDoc(doc(db, "post", userId), {
+          userpost: [],
+        });
+      }
+  
       toast.success("Successfully Logged in");
       router.push("/profile");
     } catch (error) {
       toast.error("Login Failed");
       console.log(error);
     }
-  }
+  };
     return (
       <div>
         <section className="bg-gray-50 dark:bg-gray-900">
