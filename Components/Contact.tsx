@@ -2,7 +2,7 @@ export default function Contact(){
     return (
       <div>
         <div
-            className="grid md:grid-cols-2 gap-16 items-center relative overflow-hidden p-8 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-3xl max-w-6xl mx-auto bg-white mt-6 mb-6 font-[sans-serif] before:absolute before:right-0 before:w-[300px] before:bg-blue-400 before:h-full max-md:before:hidden">
+            className="grid md:grid-cols-2  gap-16 items-center relative overflow-hidden p-8 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-3xl max-w-6xl mx-auto bg-white mt-6 mb-6 font-[sans-serif] before:absolute before:right-0 before:w-[300px] before:bg-blue-400 before:h-full max-md:before:hidden">
             <div>
                 <h2 className="text-gray-800 text-3xl font-bold">Get In Touch</h2>
                 <p className="text-sm text-gray-500 mt-4 leading-relaxed">Have a specific inquiry or looking to explore new opportunities? Our
