@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import Link from 'next/link';
 import * as tmImage from '@teachablemachine/image';
 
 interface PredictionResult {
@@ -313,16 +314,16 @@ const Report: React.FC = () => {
           />
         </div>
         <Link href="/order">
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={!formValid}
-          className={`w-full mt-4 py-3 rounded-lg font-semibold focus:ring-2 ${
-            formValid ? "bg-blue-500 text-white focus:ring-blue-600" : "bg-gray-300 text-gray-600"
-          }`}
-        >
-          Submit Complaint
-        </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!formValid}
+            className={`w-full mt-4 py-3 rounded-lg font-semibold focus:ring-2 ${
+              formValid ? "bg-blue-500 text-white focus:ring-blue-600" : "bg-gray-300 text-gray-600"
+            }`}
+          >
+            Submit Complaint
+          </button>
         </Link>
       </div>
     </div>
