@@ -1,65 +1,78 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from 'next/link';
-
+import app, { auth, db } from "@/firebase/config";
+import { collection, getDocs, getFirestore, orderBy, query } from 'firebase/firestore';
+import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation";
+const firestore=getFirestore(app);
 export default function Community() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPost, setSelectedPost] = useState(null); // State for selected post
-
-  const posts = [
-    {
-      id: 1,
-      title: "Beautiful Mountain View",
-      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-      imageUrl: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606",
-      author: "John Doe",
-      authorImage: "https://randomuser.me/api/portraits/men/32.jpg",
-      time: "2 hours ago",
-    },
-    {
-      id: 2,
-      title: "City Lights at Night",
-      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-      imageUrl: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5",
-      author: "Jane Smith",
-      authorImage: "https://randomuser.me/api/portraits/women/44.jpg",
-      time: "5 hours ago",
-    },
-    {
-      id: 3,
-      title: "Sunset Over the Lake",
-      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-      imageUrl: "https://images.unsplash.com/photo-1520037481485-d631b55200e3",
-      author: "Emily Clark",
-      authorImage: "https://randomuser.me/api/portraits/women/45.jpg",
-      time: "1 day ago",
-    },
-    {
-      id: 4,
-      title: "Forest Pathway",
-      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-      imageUrl: "https://images.unsplash.com/photo-1527288001236-744c20c6403f",
-      author: "Mark White",
-      authorImage: "https://randomuser.me/api/portraits/men/46.jpg",
-      time: "2 days ago",
-    },
-    // Add more posts here
-  ];
+  const [posts, setPosts] = useState<any[]>([]); // State to store posts
+  const [userId,setuserId]=useState("");
+  const router=useRouter();
+  useEffect(() => {
+    onAuthStateChanged(auth,(user)=>{
+      if(user){
+        setuserId(user.uid);
+      }else{
+        router.push("/signin");
+      }
+    })
+    const fetchPosts = async () => {
+      try {
+        // Reference to the 'post' collection
+        const postsRef = collection(firestore, 'post');
+        const data=await getDocs(postsRef);
+      //   // Fetch the documents from the 'post' collection using getDocs
+        console.log(data.docs);
+        const userRecord = data.docs.map((doc) => ({
+          id: doc.id, // This includes the user's email as the ID
+          ...doc.data(), // This spreads out the data fields (e.g., `data`)
+      }));
+      console.log(userRecord);
+      const formatUserPosts = (rawPosts: any[]): any[] => {
+        // Combine all user posts into a single array
+        const combinedPosts = rawPosts.flatMap(user => 
+            user.userpost.map((post: any) => ({
+                title: post.title,
+                description: post.description,
+                imageUrl: post.imageUrl,
+                // Convert Firestore Timestamp to Date first, then format it
+                createdAt: post.createdAt ? 
+                    new Date(post.createdAt.seconds * 1000).toLocaleDateString('en-IN', { 
+                        day: 'numeric', 
+                        month: 'long', 
+                        year: 'numeric' 
+                    }) : 'N/A', // Handle cases where createdAt might be missing
+                userId: user.id  // Optionally include the user ID for reference
+            }))
+        );
+        console.log('Combined posts:', combinedPosts);
+    return combinedPosts;
+};
+    const combinedPostsArray = formatUserPosts(userRecord);
+    setPosts(combinedPostsArray);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    };
+    
+    
+    fetchPosts(); // Fetch posts when component mounts
+}, []);
 
   const filteredPosts = posts.filter(
     (post) =>
       searchQuery === "" ||
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.content.toLowerCase().includes(searchQuery.toLowerCase())
+      post.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const openPostModal = (post) => {
+  const openPostModal = (post:any) => {
     setSelectedPost(post);
-  };
-
-  const closePostModal = () => {
-    setSelectedPost(null);
   };
 
   return (
@@ -88,20 +101,15 @@ export default function Community() {
             className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
             onClick={() => openPostModal(post)}
           >
-            <img src={post.imageUrl} alt={post.title} className="w-full h-64 object-cover" />
+            <img src={post.imageUrl} alt={post.title} className="w-full h-64 object-contain" />
             <div className="p-6">
               <h2 className="text-2xl font-bold text-gray-800 mb-2">{post.title}</h2>
-              <p className="text-gray-700 leading-tight mb-4">{post.content}</p>
+              <p className="text-gray-700 leading-tight mb-4 text-xl">{post.description}</p>
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center">
-                  <img
-                    src={post.authorImage}
-                    alt={post.author}
-                    className="w-10 h-10 rounded-full mr-2 object-cover"
-                  />
                   <span className="text-gray-800 font-semibold">{post.author}</span>
                 </div>
-                <span className="text-gray-600">{post.time}</span>
+                <span className="text-gray-600">{post.createdAt}</span>
               </div>
             </div>
           </div>
@@ -114,23 +122,17 @@ export default function Community() {
           <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
             <button
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-              onClick={closePostModal}
+              onClick={()=>{
+                setSelectedPost(null);
+              }}
             >
               &times;
             </button>
             <img src={selectedPost.imageUrl} alt={selectedPost.title} className="w-full h-64 object-cover mb-4" />
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{selectedPost.title}</h2>
-            <p className="text-gray-700 leading-tight mb-4">{selectedPost.content}</p>
+            <p className="text-gray-700 leading-tight mb-4">{selectedPost.description}</p>
             <div className="flex justify-between items-center">
-              <div className="flex items-center">
-                <img
-                  src={selectedPost.authorImage}
-                  alt={selectedPost.author}
-                  className="w-10 h-10 rounded-full mr-2 object-cover"
-                />
-                <span className="text-gray-800 font-semibold">{selectedPost.author}</span>
-              </div>
-              <span className="text-gray-600">{selectedPost.time}</span>
+              <span className="text-gray-600">{selectedPost.createdAt}</span>
             </div>
           </div>
         </div>

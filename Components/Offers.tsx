@@ -1,12 +1,15 @@
 "use client"; // Ensure this is a client-side component
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { auth, db } from '@/firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 const OffersPage: React.FC = () => {
   const router = useRouter();
-  const walletBalance = 1500; // Available balance
-
+  const [walletBalance,setwalletBalance] = useState(0); // Available balance
+  const [userId,setuserId]=useState("");
   // Sample offers data with deadlines
   const initialOffers = [
     { name: "50% Off on Electronics", price: 5000, deadline: "2024-09-15" },
@@ -14,7 +17,23 @@ const OffersPage: React.FC = () => {
     { name: "₹200 Cashback on Orders Above ₹1000", price: 200, deadline: "2024-09-10" },
     { name: "Free Shipping on Orders Above ₹500", price: 0, deadline: "2024-09-20" },
   ];
+  useEffect(()=>{
+    onAuthStateChanged(auth,async (user)=>{
+      if(user){
+        setuserId(user.uid);
+        const data=doc(db,"users",user.uid);
+        const userSnap = await getDoc(data);
+        if(userSnap.exists()){
+          setwalletBalance(userSnap.data().balance);
+        }
+      }else{
+        router.push("/login");
+      }
+    });
 
+
+    // console.log(data);
+  },[]);
   const [offers, setOffers] = useState(initialOffers.sort((a, b) => a.price - b.price)); // Sorted by price
   const [searchQuery, setSearchQuery] = useState('');
 

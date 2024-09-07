@@ -3,30 +3,53 @@ import Link from 'next/link';
 import { useState } from 'react';
 import {useRouter} from 'next/navigation'
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth } from '@/firebase/config';
+import { auth, db } from '@/firebase/config';
 import {toast} from 'react-toastify';
+import { doc, setDoc } from 'firebase/firestore';
 const googleauth=new GoogleAuthProvider();
 export default function Signin(){
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const signinusingemail=()=>{
-    const res=signInWithEmailAndPassword(auth,email,password)
-    .then(()=>{ 
-      toast.success("Successfully Logged in");
-        router.push("/profile");
-    } ).catch((error)=>{
-      toast.error("Invalid Credentials");
-    });
-  }
-  const signinwithgoogle=()=>{
-    signInWithPopup(auth,googleauth)
-    .then(()=>{
+  const signinusingemail=async()=>{
+    try {
+      const res=await signInWithEmailAndPassword(auth,email, password);
+      await setDoc(doc(db, "users", res.user.uid), {
+        email: email,
+        password: password,
+        id: res.user.uid,
+        orders: [],
+        balance: 0,
+      });
+      await setDoc(doc(db, "post", res.user.uid), {
+        userpost: [],
+      });
       toast.success("Successfully Logged in");
       router.push("/profile");
-    }).catch(()=>{
+    } catch (error) {
+      toast.error("Invalid Credentials");
+    }
+  }
+  const signinwithgoogle=async ()=>{
+    try {
+      const res = await signInWithPopup(auth, googleauth);
+      console.log(res);
+      await setDoc(doc(db, "users", res.user.uid), {
+        email: res.user.email,
+        password:"",
+        id: res.user.uid,
+        orders: [],
+        balance: 0,
+      });
+      await setDoc(doc(db, "post", res.user.uid), {
+        userpost: [],
+      });
+      toast.success("Successfully Logged in");
+      router.push("/profile");
+    } catch (error) {
       toast.error("Login Failed");
-    });
+      console.log(error);
+    }
   }
     return (
       <div>

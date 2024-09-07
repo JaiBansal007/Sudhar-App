@@ -2,10 +2,11 @@
 import Upload from '@/firebase/upload'; // Assuming this uploads the image to Firebase Storage
 import React, { useEffect, useState } from "react";
 import { auth, db } from "@/firebase/config"; // Import Firestore instance
-import { collection, doc, updateDoc, arrayUnion, setDoc, addDoc } from 'firebase/firestore';
+import { collection, doc, updateDoc, arrayUnion, setDoc, addDoc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { increment } from 'firebase/database';
 
 export default function Post() {
     const [title, setTitle] = useState("");
@@ -37,17 +38,30 @@ export default function Post() {
         try {
             // Upload image to Firebase Storage and get the image URL
             const imageUrl = await Upload(image);
-            // Reference to the user's posts subcollection (assuming each user has a posts subcollection)
-            const userPostsRef = collection(db, `post${userId}`);
 
-            // Add the new post to the user's posts subcollection
-            await addDoc(userPostsRef, {
-              title: title,
-              description: description,
-              imageUrl: imageUrl,
-              createdAt: new Date(),
+            // Reference to the user's posts document
+            const userPostsRef = doc(db, 'post', userId);
+
+            // Add the new post to the user's 'userpost' array
+            await updateDoc(userPostsRef, {
+              userpost: arrayUnion({
+                title: title,
+                description: description,
+                imageUrl: imageUrl,
+                createdAt: new Date(),
+              })
             });
-
+            
+            const user=doc(db,"users",userId);
+            const usersnap=await getDoc(user);
+            if(usersnap.exists()){
+              const currentbalance=Number(Number(usersnap.data().balance)+100);
+              console.log(currentbalance);
+              await updateDoc(user,{
+                balance:currentbalance,
+              });
+            }
+            
             // Show success message and redirect to the community page
             router.push("/community");
             toast.success("Post created successfully");
