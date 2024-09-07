@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import Link from 'next/link';
 import * as tmImage from '@teachablemachine/image';
-
+import {toast} from 'react-toastify';
+import { useRouter } from 'next/navigation';
 interface PredictionResult {
   text: string;
   color: string;
@@ -28,7 +28,7 @@ const Report: React.FC = () => {
   const [formValid, setFormValid] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-
+  const router=useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -203,9 +203,10 @@ const Report: React.FC = () => {
 
   const handleSubmit = () => {
     if (formValid) {
-      alert("Form submitted successfully!");
+      toast.success("Complaint submitted successfully.");
+      router.push("/");
     } else {
-      setError("Image must be validated first.");
+      toast.error("Please validate the images before submitting");
     }
   };
 
@@ -313,7 +314,6 @@ const Report: React.FC = () => {
             onChange={(e) => setManualAddress(e.target.value)}
           />
         </div>
-        <Link href="/order">
           <button
             type="button"
             onClick={handleSubmit}
@@ -324,7 +324,6 @@ const Report: React.FC = () => {
           >
             Submit Complaint
           </button>
-        </Link>
       </div>
     </div>
   );

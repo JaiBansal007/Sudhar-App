@@ -1,23 +1,43 @@
 "use client";
 
-import React, { useState } from 'react';
+import { auth, db } from '@/firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
+import { set } from 'firebase/database';
+import { doc, getDoc } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 const Wallet: React.FC = () => {
   const [showPopup, setShowPopup] = useState<boolean>(false);
-  const [selectedCoin, setSelectedCoin] = useState<string | null>(null);
-
-  // Sample data
-  const coins = [
-    { value: "$15,000" },   
-  ];
-
+  const [userId,setuserId]=useState("");
+  const [selectedCoin, setSelectedCoin] = useState<number | null>(null);
+  const router = useRouter();
+  const [coin,setcoin] =useState(0);
   const transactions = [
     { date: "2024-09-01", description: "Bought 0.1 BTC", amount: "-$3,000" },
     { date: "2024-09-05", description: "Sold 1 ETH", amount: "+$1,500" },
     { date: "2024-09-10", description: "Transfer to Wallet", amount: "-$500" },
   ];
+  // Sample data
+  useEffect(() => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setuserId(user.uid);
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+  
+        if (userSnap.exists()) {
+          const fetchedBalance = userSnap.data().balance;
+          setcoin(fetchedBalance);
+        }
+      } else {
+        router.push("/login");
+      }
+    });
+  }, []);
 
-  const handleCoinClick = (coin: string) => {
+
+  const handleCoinClick = (coin: number) => {
     setSelectedCoin(coin);
     setShowPopup(true);
   };
@@ -35,17 +55,13 @@ const Wallet: React.FC = () => {
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Available Coins</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {coins.map((coin) => (
-              
-              <div
+          <div
                 
                 className="bg-blue-500 text-white flex justify-center p-4 rounded-lg shadow-md cursor-pointer hover:bg-blue-600"
-                onClick={() => handleCoinClick(coin.value)}
+                onClick={() => handleCoinClick(coin)}
               >
-                <p className="text-lg font-bold">{coin.value}</p>
+                <p className="text-lg font-bold">{coin}</p>
               </div>
-              
-            ))}
           </div>
         </div>
 

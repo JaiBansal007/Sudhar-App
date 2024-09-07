@@ -40,11 +40,30 @@ const OffersPage: React.FC = () => {
   // Filter offers based on search query
   const filteredOffers = offers.filter(offer => offer.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  const handleVoucherClick = (price: number) => {
+  const handleVoucherClick = (name: string, price: number) => {
     if (price <= walletBalance) {
-      router.push('/transaction');
+      // Pass voucher name and price to the transaction page as query parameters
+      router.push(`/transaction?voucherName=${encodeURIComponent(name)}&voucherPrice=${price}`);
     }
   };
+
+  useEffect(()=>{
+    onAuthStateChanged(auth,async (user)=>{
+      if(user){
+        setuserId(user.uid);
+        const data=doc(db,"users",user.uid);
+        const userSnap = await getDoc(data);
+        if(userSnap.exists()){
+          setwalletBalance(userSnap.data().balance);
+        }
+      }else{
+        router.push("/login");
+      }
+    });
+
+
+    // console.log(data);
+  },[]);
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col items-center px-4 sm:px-6 lg:px-8">
@@ -81,7 +100,7 @@ const OffersPage: React.FC = () => {
                       ? 'border-gray-300 cursor-not-allowed bg-gray-100'
                       : 'border-gray-200 hover:border-blue-500 cursor-pointer'
                   }`}
-                  onClick={() => offer.price <= walletBalance && handleVoucherClick(offer.price)}
+                  onClick={() => offer.price <= walletBalance && handleVoucherClick(offer.name, offer.price)}
                 >
                   <div className="text-center">
                     <h4 className="text-lg font-semibold text-gray-900">{offer.name}</h4>
