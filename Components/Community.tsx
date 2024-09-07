@@ -128,7 +128,7 @@ export default function Community() {
             >
               &times;
             </button>
-            <img src={selectedPost.imageUrl} alt={selectedPost.title} className="w-full h-64 object-cover mb-4" />
+            <img src={selectedPost.imageUrl} alt={selectedPost.title} className="w-full h-64 object-contain mb-4" />
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{selectedPost.title}</h2>
             <p className="text-gray-700 leading-tight mb-4">{selectedPost.description}</p>
             <div className="flex justify-between items-center">
