@@ -1,37 +1,140 @@
+"use client";
+
+import React, { useState } from "react";
+import Link from 'next/link';
+
 export default function Community() {
-  const num = 5; // Number of times to render the component
-  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedPost, setSelectedPost] = useState(null); // State for selected post
+
+  const posts = [
+    {
+      id: 1,
+      title: "Beautiful Mountain View",
+      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+      imageUrl: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606",
+      author: "John Doe",
+      authorImage: "https://randomuser.me/api/portraits/men/32.jpg",
+      time: "2 hours ago",
+    },
+    {
+      id: 2,
+      title: "City Lights at Night",
+      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+      imageUrl: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5",
+      author: "Jane Smith",
+      authorImage: "https://randomuser.me/api/portraits/women/44.jpg",
+      time: "5 hours ago",
+    },
+    {
+      id: 3,
+      title: "Sunset Over the Lake",
+      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+      imageUrl: "https://images.unsplash.com/photo-1520037481485-d631b55200e3",
+      author: "Emily Clark",
+      authorImage: "https://randomuser.me/api/portraits/women/45.jpg",
+      time: "1 day ago",
+    },
+    {
+      id: 4,
+      title: "Forest Pathway",
+      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+      imageUrl: "https://images.unsplash.com/photo-1527288001236-744c20c6403f",
+      author: "Mark White",
+      authorImage: "https://randomuser.me/api/portraits/men/46.jpg",
+      time: "2 days ago",
+    },
+    // Add more posts here
+  ];
+
+  const filteredPosts = posts.filter(
+    (post) =>
+      searchQuery === "" ||
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.content.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const openPostModal = (post) => {
+    setSelectedPost(post);
+  };
+
+  const closePostModal = () => {
+    setSelectedPost(null);
+  };
+
   return (
-    <>
-      <div className="flex flex-col justify-center items-center bg-gray-100 min-h-[60%] pt-10">
-        {Array.from({ length: num }).map((_, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden max-w-lg w-full mb-6">
-            <img
-              src="https://images.unsplash.com/photo-1454496522488-7a8e488e8606"
-              alt="Mountain"
-              className="w-full h-64 object-cover"
-            />
+    <div className="min-h-screen bg-gray-50 p-4 md:p-10 flex flex-col items-center">
+      {/* Search Bar and Create Post Button */}
+      <div className="w-full max-w-5xl mb-8 flex justify-between items-center">
+        <input
+          type="text"
+          placeholder="Search posts..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full md:w-1/2 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <Link href="/post">
+        <button className="ml-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-blue-600 focus:outline-none">
+          Create Post
+        </button>
+        </Link>
+      </div>
+
+      {/* Posts Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl w-full">
+        {filteredPosts.map((post) => (
+          <div
+            key={post.id}
+            className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
+            onClick={() => openPostModal(post)}
+          >
+            <img src={post.imageUrl} alt={post.title} className="w-full h-64 object-cover" />
             <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Beautiful Mountain View</h2>
-              <p className="text-gray-700 leading-tight mb-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu sapien porttitor, blandit velit ac,
-                vehicula elit. Nunc et ex at turpis rutrum viverra.
-              </p>
-              <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">{post.title}</h2>
+              <p className="text-gray-700 leading-tight mb-4">{post.content}</p>
+              <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center">
                   <img
-                    src="https://randomuser.me/api/portraits/men/32.jpg"
-                    alt="Avatar"
-                    className="w-8 h-8 rounded-full mr-2 object-cover"
+                    src={post.authorImage}
+                    alt={post.author}
+                    className="w-10 h-10 rounded-full mr-2 object-cover"
                   />
-                  <span className="text-gray-800 font-semibold">John Doe</span>
+                  <span className="text-gray-800 font-semibold">{post.author}</span>
                 </div>
-                <span className="text-gray-600">2 hours ago</span>
+                <span className="text-gray-600">{post.time}</span>
               </div>
             </div>
           </div>
         ))}
       </div>
-    </>
+
+      {/* Modal for Post Details */}
+      {selectedPost && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+              onClick={closePostModal}
+            >
+              &times;
+            </button>
+            <img src={selectedPost.imageUrl} alt={selectedPost.title} className="w-full h-64 object-cover mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{selectedPost.title}</h2>
+            <p className="text-gray-700 leading-tight mb-4">{selectedPost.content}</p>
+            <div className="flex justify-between items-center">
+              <div className="flex items-center">
+                <img
+                  src={selectedPost.authorImage}
+                  alt={selectedPost.author}
+                  className="w-10 h-10 rounded-full mr-2 object-cover"
+                />
+                <span className="text-gray-800 font-semibold">{selectedPost.author}</span>
+              </div>
+              <span className="text-gray-600">{selectedPost.time}</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

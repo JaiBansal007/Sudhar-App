@@ -6,51 +6,55 @@ import { collection, doc, updateDoc, arrayUnion, setDoc, addDoc } from 'firebase
 import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import 'firebase/firestore';
 
 export default function Post() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [image, setImage] = useState(null);
     const [userId, setUserId] = useState("");
+    const [imagePreview, setImagePreview] = useState(null); // State to hold image preview URL
     const router = useRouter();
 
+    // Handle image selection and preview
     const handleImageChange = (e: any) => {
-        setImage(e.target.files[0]);
+      const file = e.target.files[0];
+      if (file) {
+        setImage(file);
+        setImagePreview(URL.createObjectURL(file)); // Create a preview URL for the selected image
+      }
+    };
+
+    // Handle image removal
+    const handleImageRemove = () => {
+      setImage(null);
+      setImagePreview(null); // Remove image preview
     };
 
     const handleSubmit = async (e: any) => {
-        e.preventDefault(); 
+        e.preventDefault();
         console.log("Submitting post...");
 
         try {
             // Upload image to Firebase Storage and get the image URL
-            const imageUrl = await Upload(image).then((url) =>{
-              console.log(url);
-              const userDocRef = doc(db, 'post', userId);
+            const imageUrl = await Upload(image);
+            // Reference to the user's posts subcollection (assuming each user has a posts subcollection)
+            const userPostsRef = collection(db, `post${userId}`);
 
-            // Add new post to the user's 'posts' subcollection
-            updateDoc(userDocRef, {
-              userpost: arrayUnion({
-                title: title,
-                description: description,
-                imageUrl: url,
-                createdAt: new Date(),
-              })
-            }).then(() => {
-              toast.success("Post created successfully");
-              router.push("/community");
-            }).catch((error) => {
-              console.error("Error creating post: ", error);
+            // Add the new post to the user's posts subcollection
+            await addDoc(userPostsRef, {
+              title: title,
+              description: description,
+              imageUrl: imageUrl,
+              createdAt: new Date(),
             });
-          });
 
-            // toast.success("Post created successfully");
-            // console.log("Post created successfully");
+            // Show success message and redirect to the community page
+            router.push("/community");
+            toast.success("Post created successfully");
 
         } catch (error) {
             console.error("Error creating post:", error);
-            // toast.error("Failed to create post");
+            toast.error("Failed to create post");
         }
     };
 
@@ -68,60 +72,83 @@ export default function Post() {
     }, []);
 
     return (
-        <div className='flex justify-center items-center h-screen w-screen'>
-            <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-10 ">
-                <h2 className="text-2xl font-semibold text-center mb-6">Create a Post</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Title
-                        </label>
-                        <input
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                            placeholder="Post Title"
-                            required
-                        />
-                    </div>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+      <div className="max-w-xl w-full bg-white shadow-lg rounded-lg p-8">
+        <h2 className="text-3xl font-bold text-center text-indigo-600 mb-8">
+          Create a Post
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Title Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Title
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Post Title"
+              required
+            />
+          </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Description
-                        </label>
-                        <textarea
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                            placeholder="Post Description"
-                            rows={4}
-                            required
-                        />
-                    </div>
+          {/* Description Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Post Description"
+              rows={5}
+              required
+            />
+          </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Upload Image
-                        </label>
-                        <input
-                            type="file"
-                            onChange={handleImageChange}
-                            className="w-full mt-1 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
-                            accept="image/*"
-                        />
-                    </div>
+          {/* Image Upload Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Upload Image
+            </label>
+            <input
+              type="file"
+              onChange={handleImageChange}
+              className="w-full p-2 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              accept="image/*"
+            />
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="mt-4 relative">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-64 object-cover rounded-lg shadow-lg"
+                />
+                <button
+                  type="button"
+                  onClick={handleImageRemove}
+                  className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-md hover:bg-red-600"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
 
-                    <div>
-                        <button
-                            type="submit"
-                            className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            Submit
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    )
+          {/* Submit Button */}
+          <div>
+            <button
+              type="submit"
+              className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
