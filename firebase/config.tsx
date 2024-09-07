@@ -4,7 +4,7 @@ import { createContext, useContext, ReactNode } from "react";
 import { getDatabase, ref, set } from "firebase/database";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-
+import 'firebase/firestore'; // For Firestore
 // Define the shape of the context value
 interface FirebaseContextType {
   signupwithemailandpassword: (email: string, password: string) => Promise<void>;
@@ -39,8 +39,7 @@ const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app);
 export const auth = getAuth();
 export const database = getDatabase();
-export const db = getFirestore();
-
+export const db = getFirestore(app);
 // FirebaseProvider to wrap around components
 interface FirebaseProviderProps {
   children: ReactNode;
