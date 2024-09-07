@@ -40,6 +40,8 @@ export default function Footer(){
             </svg></a></li>
         </ul>
 
+        
+
         <p className="text-base">© Sudhaar. All rights reserved.</p>
       </div>
     </footer>
