@@ -1,68 +1,85 @@
 "use client"; // Ensure this is a client-side component
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const OffersPage: React.FC = () => {
   const router = useRouter();
   const walletBalance = 1500; // Available balance
 
-  // Sample offers data
-  const offers = [
-    { name: "50% Off on Electronics", price: 500 },
-    { name: "Buy 1 Get 1 Free on Apparel", price: 299 },
-    { name: "₹200 Cashback on Orders Above ₹1000", price: 200 },
-    { name: "Free Shipping on Orders Above ₹500", price: 0 },
+  // Sample offers data with deadlines
+  const initialOffers = [
+    { name: "50% Off on Electronics", price: 5000, deadline: "2024-09-15" },
+    { name: "Buy 1 Get 1 Free on Apparel", price: 299, deadline: "2024-10-01" },
+    { name: "₹200 Cashback on Orders Above ₹1000", price: 200, deadline: "2024-09-10" },
+    { name: "Free Shipping on Orders Above ₹500", price: 0, deadline: "2024-09-20" },
   ];
+
+  const [offers, setOffers] = useState(initialOffers.sort((a, b) => a.price - b.price)); // Sorted by price
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter offers based on search query
+  const filteredOffers = offers.filter(offer => offer.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const handleVoucherClick = (price: number) => {
     if (price <= walletBalance) {
-      // Redirect to transaction page if voucher can be redeemed
       router.push('/transaction');
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col items-center px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-2xl mt-8 p-6 bg-white rounded-lg shadow-md">
-        {/* Company Info Section */}
-        <div className="flex items-center mb-8">
-          <img
-            src="/path/to/logo.png" // Replace with your logo path
-            alt="Company Logo"
-            className="h-12 w-auto mr-4"
-          />
-          <h1 className="text-3xl font-bold text-gray-900">Company Name</h1>
-        </div>
-
+      <div className="w-full max-w-2xl my-8 p-6 bg-white rounded-lg shadow-md">
         {/* Wallet Balance Section */}
         <div className="mb-6 p-4 bg-blue-500 text-white rounded-lg shadow-md">
           <h2 className="text-xl font-bold">Available Wallet Balance</h2>
           <p className="text-2xl font-semibold">₹{walletBalance}</p>
         </div>
 
-        {/* Vouchers Section */}
+        {/* Search Offer Section */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search offers..."
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        {/* Vouchers Section with Larger Square Cards */}
         <div>
-          <h3 className="text-2xl font-semibold text-gray-800 mb-4">Available Vouchers</h3>
-          <div className="space-y-4">
-            {offers.map((offer, index) => (
-              <div
-                key={index}
-                className={`flex justify-between items-center p-4 bg-white rounded-lg shadow-md border ${
-                  offer.price > walletBalance ? 'border-gray-300 cursor-not-allowed' : 'border-gray-200 hover:border-blue-500 cursor-pointer'
-                }`}
-                onClick={() => offer.price <= walletBalance && handleVoucherClick(offer.price)}
-              >
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900">{offer.name}</h4>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Available Vouchers</h3>
+
+          {/* Scrollable container for vouchers */}
+          <div className="max-h-96 overflow-y-scroll">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 justify-items-center">
+              {filteredOffers.slice(0, 4).map((offer, index) => (
+                <div
+                  key={index}
+                  className={`flex flex-col justify-between items-center p-6 bg-white rounded-lg shadow-md border h-64 w-64 ${
+                    offer.price > walletBalance
+                      ? 'border-gray-300 cursor-not-allowed bg-gray-100'
+                      : 'border-gray-200 hover:border-blue-500 cursor-pointer'
+                  }`}
+                  onClick={() => offer.price <= walletBalance && handleVoucherClick(offer.price)}
+                >
+                  <div className="text-center">
+                    <h4 className="text-lg font-semibold text-gray-900">{offer.name}</h4>
+                  </div>
+                  <div className="mt-2 text-center">
+                    <p className="text-sm text-gray-600">Valid until {offer.deadline}</p>
+                    <p
+                      className={`text-lg font-bold mt-4 ${
+                        offer.price > walletBalance ? 'text-gray-500' : 'text-blue-500'
+                      }`}
+                    >
+                      ₹{offer.price === 0 ? 'Free' : offer.price}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className={`text-lg font-bold ${
-                    offer.price > walletBalance ? 'text-gray-500' : 'text-blue-500'
-                  }`}>₹{offer.price === 0 ? 'Free' : offer.price}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
