@@ -36,7 +36,7 @@ export default function Signin(){
       <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                  Sign in to your account
+                  MCD Sign in
               </h1>
               <form className="space-y-4 md:space-y-6" action="#">
                   <div>
@@ -56,17 +56,18 @@ export default function Signin(){
                             <label className="text-gray-500 dark:text-gray-300">Remember me</label>
                           </div>
                       </div>
-                      <Link href="forgot">
+                      <Link href="/mcd/forgot">
                       <button className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Forgot password?</button>
                   </Link>
                   </div>
                   <button onClick={signinusingemail} type="submit" className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign in</button>
-                  <div className='flex justify-center space-x-5'><Link href="/mcd/signin">
+                  <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+  <div className='flex justify-center space-x-5'><Link href="/signin">
     <button
       type="submit"
       className="w-full sm:w-44 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
     >
-      MCD
+      User
     </button>
   </Link>
   
@@ -79,6 +80,8 @@ export default function Signin(){
     </button>
   </Link>
   </div>
+</div>
+
                   <div className="space-x-6 flex justify-center mt-6">
             <button onClick={signinwithgoogle} type="button" className="border-none outline-none">
               <svg xmlns="http://www.w3.org/2000/svg" width="32px" className="inline" viewBox="0 0 512 512">
@@ -100,7 +103,7 @@ export default function Signin(){
           </div>
                   <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                       Don’t have an account yet? 
-                      <Link href="/signup">
+                      <Link href="/mcd/signup">
                       <button className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</button>
                   </Link>
                   </p>
