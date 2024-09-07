@@ -222,7 +222,7 @@ const Report: React.FC = () => {
               title:title,
               description:description, 
               location:address,
-              completed:false,
+              status:false,
             })
           });
     }

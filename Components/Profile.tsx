@@ -4,8 +4,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/firebase/config";
+import { auth, db } from "@/firebase/config";
 import { useRouter } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
+
 interface Complaint {
   id: string;
   title: string;
@@ -18,46 +20,55 @@ const Profile: React.FC = () => {
   const [showComplaints, setShowComplaints] = useState<boolean>(false);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<"all" | "active" | "resolved">(
-    "all"
-  );
+  const [activeTab, setActiveTab] = useState<"all" | "active" | "resolved">("all");
+  const [userID, setUserID] = useState<string>("");
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const router = useRouter();
-  const [User, setUser] = useState<any>(null);
+
   useEffect(() => {
-    // Fetch complaints from API
-   const fetchdetials = async () => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        console.log(user);
-        setUser(user.email);
-      }else{
-        router.push("/signin");
-      }
-    });
+    const fetchDetails = async () => {
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          setUserID(user.uid);
+          setUserEmail(user.email);
+        } else {
+          router.push("/signin");
+        }
+      });
     };
+
+    fetchDetails();
+  }, [router]);
+
+  useEffect(() => {
     const fetchComplaints = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get("/api/complaints"); // Replace with your API endpoint
-        setComplaints(response.data);
-      } catch (error) {
-        console.error("Failed to fetch complaints", error);
-      } finally {
-        setLoading(false);
+      if (userID) {
+        try {
+          setLoading(true);
+          const userRef = doc(db, "users", userID);
+          const userSnap = await getDoc(userRef);
+
+          if (userSnap.exists()) {
+            const fetchedComplaints = userSnap.data().complaint || [];
+            setComplaints(fetchedComplaints);
+          }
+        } catch (error) {
+          console.error("Failed to fetch complaints", error);
+        } finally {
+          setLoading(false);
+        }
       }
     };
-    fetchdetials();
+
     if (showComplaints) {
       fetchComplaints();
     }
-  }, [showComplaints]);
+  }, [showComplaints, userID]);
 
   const now = new Date();
 
   const getComplaintsByStatus = (status: "all" | "active" | "resolved") => {
-    return complaints.filter(
-      (complaint) => status === "all" || complaint.status === status
-    );
+    return complaints.filter((complaint) => status === "all" || complaint.status === "active"|| complaint.status === "resolved");
   };
 
   const handleRepostComplaint = (id: string) => {
@@ -80,8 +91,8 @@ const Profile: React.FC = () => {
 
           {/* Profile Information */}
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900">{auth.currentUser?.displayName||"User"}</h1>
-            <p className="text-sm text-gray-600">{User}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{auth.currentUser?.displayName || "User"}</h1>
+            <p className="text-sm text-gray-600">{userEmail}</p>
           </div>
 
           {/* Action Buttons */}
@@ -122,9 +133,7 @@ const Profile: React.FC = () => {
                   {["all", "active", "resolved"].map((tab) => (
                     <button
                       key={tab}
-                      onClick={() =>
-                        setActiveTab(tab as "all" | "active" | "resolved")
-                      }
+                      onClick={() => setActiveTab(tab as "all" | "active" | "resolved")}
                       className={`flex-1 py-2 px-2 sm:px-4 text-center rounded-t-lg ${
                         activeTab === tab
                           ? "bg-blue-500 text-white"
@@ -136,51 +145,43 @@ const Profile: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Complaints Dropdown */}
+                {/* Complaints Display */}
                 <div className="bg-white rounded-lg shadow-md">
                   {loading ? (
-                    <p className="text-center text-gray-600">
-                      Loading complaints...
-                    </p>
+                    <p className="text-center text-gray-600">Loading complaints...</p>
                   ) : (
                     <>
                       {getComplaintsByStatus(activeTab).map((complaint) => {
+                        console.log(activeTab);
                         const complaintDate = new Date(complaint.createdAt);
                         const diffDays = Math.floor(
-                          (now.getTime() - complaintDate.getTime()) /
-                            (1000 * 60 * 60 * 24)
+                          (now.getTime() - complaintDate.getTime()) / (1000 * 60 * 60 * 24)
                         );
 
                         return (
                           <div key={complaint.id} className="border-t border-gray-200">
                             <div className="p-4">
-                              <h3 className="text-lg font-bold text-gray-900">
-                                {complaint.title}
-                              </h3>
-                              <div className="flex gap-2 mt-2 flex-wrap">
-                                {complaint.photos.map((photo, index) => (
-                                  <img
-                                    key={index}
-                                    src={photo}
-                                    alt={`Complaint ${complaint.title} Photo ${
-                                      index + 1
-                                    }`}
-                                    className="w-24 h-24 object-cover rounded-md"
-                                  />
-                                ))}
-                              </div>
-                              {activeTab === "all" && (
+                              <h3 className="text-lg font-bold text-gray-900">{complaint.title}</h3>
+                              <p className="text-md text-gray-900">{complaint.description}</p>
+                              {activeTab === "all"&& (
                                 <p className="mt-2 text-sm text-gray-500">
-                                  Status:{" "}
-                                  {complaint.status.charAt(0).toUpperCase() +
-                                    complaint.status.slice(1)}
+                                  Status: {complaint.status ? <span className="text-green-600 text-md">Resolved</span> :<span className="text-red-700 text-md">Active</span>}
                                 </p>
                               )}
+                              {activeTab === "resolved" &&(
+                                <p className="mt-2 text-sm text-gray-500">
+                                  Status: <span className="text-green-600 text-md">Resolved</span>
+                                </p>
+                              )}
+                              {activeTab === 'active' &&(
+                                <p className="mt-2 text-sm text-gray-500">
+                                  Status: <span className="text-red-600 text-md">Active</span>
+                                </p>
+                              )}
+
                               {activeTab === "active" && diffDays > 3 && (
                                 <button
-                                  onClick={() =>
-                                    handleRepostComplaint(complaint.id)
-                                  }
+                                  onClick={() => handleRepostComplaint(complaint.id)}
                                   className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500"
                                 >
                                   Repost Complaint
