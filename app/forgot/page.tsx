@@ -1,9 +1,10 @@
-import Signin from '@/Components/Signin'
+import Forgot from '@/Components/Forgot'
 
 export default function Home(){
   return (
     <div>
-      <Signin />   
+      <Forgot />   
     </div>
   )
 }
+
