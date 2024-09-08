@@ -186,7 +186,7 @@ export default function Chatbot() {
       {showChatbot && (
         <div className="fixed right-4 bottom-20 w-72 md:w-80 lg:w-96 bg-white rounded-xl shadow-2xl overflow-hidden transition-transform transform scale-100 opacity-100">
           <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex justify-between items-center rounded-t-xl shadow-sm">
-            <h2 className="font-semibold">Assistant</h2>
+            <h2 className="font-semibold">Sudhaar Mitra</h2>
           </header>
 
           {/* Chat messages */}
