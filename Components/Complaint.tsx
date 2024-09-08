@@ -249,6 +249,11 @@ const Report: React.FC = () => {
         console.log(currentbalance);
         await updateDoc(user,{
           balance:currentbalance,
+          orders:arrayUnion({
+            time:new Date().toISOString(),
+            voucherName:"Complaint Reward",
+            voucherPrice:+100
+          })
         });
       }
       toast.success("Complaint submitted successfully.");

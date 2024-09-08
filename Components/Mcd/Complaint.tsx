@@ -1,7 +1,9 @@
 "use client";
-import app, { db } from "@/firebase/config";
+import app, { auth, db } from "@/firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, Firestore, getDoc, getDocs, getFirestore, updateDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 const firestore=getFirestore(app);
 interface Complaint {
   id: string;
@@ -15,6 +17,7 @@ interface Complaint {
 
 const ReceivedComplaints: React.FC = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const router=useRouter();
   const fetchPosts = async () => {
     try {
       // Reference to the 'post' collection
@@ -93,6 +96,11 @@ const ReceivedComplaints: React.FC = () => {
   };
 
   useEffect(() => {
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.push("/mcd/signin");
+      }
+    });
     fetchPosts(); // Fetch posts when component mounts
   },[]);
 

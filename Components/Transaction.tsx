@@ -64,7 +64,7 @@ const TransactionPage = () => {
             orders:arrayUnion({
               time:new Date().toISOString(),
               voucherName:voucherName,
-              voucherPrice:voucherPrice
+              voucherPrice:-voucherPrice
             })
           })
     }

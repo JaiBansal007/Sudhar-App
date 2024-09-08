@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { createUserWithEmailAndPassword ,GoogleAuthProvider, signInWithPopup} from 'firebase/auth';
+import { createUserWithEmailAndPassword ,GoogleAuthProvider, onAuthStateChanged, signInWithPopup} from 'firebase/auth';
 import { auth, db } from '@/firebase/config';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,11 @@ export default function SignUp(){
   const [match, setMatch] = useState(true);
   const router = useRouter();
   useEffect(() => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        router.push("/mcd/profile");
+      }
+    });
     if(password!==confirmPassword){
       setMatch(false);
     }else{
@@ -30,15 +35,9 @@ export default function SignUp(){
           email: email,
           password: password,
           id: res.user.uid,
-          orders: [],
-          balance: 0,
-        });
-
-        await setDoc(doc(db, "post", res.user.uid), {
-          userpost: [],
         });
         toast.success("Successfully Logged in");
-        router.push("profile");
+        router.push("/mcd/profile");
       } catch (error) {
         toast.error("Invalid Credentials");
       }
@@ -59,7 +58,7 @@ export default function SignUp(){
         userpost: [],
       });
       toast.success("Successfully Logged in");
-      router.push("profile");
+      router.push("/mcd/profile");
     } catch (error) {
       toast.error("Login Failed");
       console.log(error);
