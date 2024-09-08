@@ -5,83 +5,104 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Toaster, toast } from 'react-hot-toast';
 import { auth, db } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
-import { arrayUnion, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
+import emailjs from 'emailjs-com';  // Import emailjs
 
 const TransactionPage = () => {
   const searchParams = useSearchParams();
   const voucherName = searchParams.get('voucherName') || 'Unknown Voucher';
   const voucherPrice = parseInt(searchParams.get('voucherPrice') || '0');
-  const [initialBalance,setinitialBalance] = useState(0); // Initial balance
-  const [userId,setuserId]=useState("");
+  const [initialBalance, setInitialBalance] = useState(0);
+  const [userId, setUserId] = useState("");
+  const [userEmail, setUserEmail] = useState("");  // To store the user's email
   const [balance, setBalance] = useState(initialBalance);
   const [finalBalance, setFinalBalance] = useState(initialBalance);
-  const [isMounted, setIsMounted] = useState(true); // To track when the component is mounted
   const router = useRouter();
+
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setuserId(user.uid);
+        setUserId(user.uid);
+        setUserEmail(user.email);  // Capture the user's email
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
-  
+
         if (userSnap.exists()) {
           const fetchedBalance = userSnap.data().balance;
-  
-          // Set the balance in state
-          setinitialBalance(fetchedBalance); 
-          setFinalBalance(fetchedBalance-voucherPrice);
-          setBalance(fetchedBalance); // set both initialBalance and balance to the fetched value
+
+          // Set balance in state
+          setInitialBalance(fetchedBalance);
+          setFinalBalance(fetchedBalance - voucherPrice);
+          setBalance(fetchedBalance);
         }
       } else {
         router.push("/login");
       }
     });
-  }, []);
-  
+  }, [router, voucherPrice]);
 
   // Function to handle transaction completion
   const handleCompleteTransaction = () => {
     if (finalBalance >= 0) {
       toast.success('Transaction Successfully Completed!');
 
+      // Send email notification via emailjs
+      sendEmailNotification();
     } else {
       toast.error('Insufficient Balance!');
     }
   };
 
   // Function to calculate final balance after subtracting voucher price
-  const handleTransaction = async() => {
+  const handleTransaction = async () => {
     const updatedBalance = balance - voucherPrice;
-    const user=doc(db,"users",userId);
-    const usersnap=await getDoc(user);
-    if(usersnap.exists()){
-          const currentbalance=Number(Number(usersnap.data().balance)-voucherPrice);
-          console.log(currentbalance);
-          await updateDoc(user,{
-            balance:currentbalance,
-          });
-          await updateDoc(user,{
-            orders:arrayUnion({
-              time:new Date().toISOString(),
-              voucherName:voucherName,
-              voucherPrice:-voucherPrice
-            })
-          })
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const currentBalance = Number(userSnap.data().balance) - voucherPrice;
+      await updateDoc(userRef, {
+        balance: currentBalance,
+        orders: arrayUnion({
+          time: new Date().toISOString(),
+          voucherName: voucherName,
+          voucherPrice: -voucherPrice
+        })
+      });
     }
     setBalance(updatedBalance);
     setFinalBalance(updatedBalance);
     router.push('/wallet');
   };
 
-  if (!isMounted) {
-    return null; // Return null during SSR, ensuring no rendering happens until it's mounted.
-  }
+  // Function to send email notification using emailjs
+  const sendEmailNotification = () => {
+    const emailParams = {
+      user_email: userEmail,  // Recipient email
+      voucher_name: voucherName,  // Voucher details
+      voucher_price: voucherPrice,
+      final_balance: finalBalance,  // Updated balance after transaction
+    };
+
+    emailjs.send(
+      'service_r8lthks',  // Replace with your EmailJS service ID
+      'template_rjukh77',  // Replace with your EmailJS template ID
+      emailParams,
+      'QrK1DlzU_Ho0BMgKD'  // Replace with your EmailJS public key
+    )
+    .then((response) => {
+      console.log('Email sent successfully:', response.status, response.text);
+    })
+    .catch((error) => {
+      console.error('Failed to send email:', error);
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       {/* Toaster for displaying notifications */}
       <Toaster position="top-center" reverseOrder={false} />
-      
+
       <div className="max-w-lg w-full bg-white shadow-lg rounded-xl p-8 space-y-6">
         <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">Complete Your Transaction</h1>
 
