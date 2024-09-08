@@ -16,8 +16,11 @@ export default function Contact() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Debugging to check form data before submission
+    console.log('Form Data:', formData);
 
     const templateParams = {
       name: formData.name,
@@ -26,23 +29,26 @@ export default function Contact() {
       message: formData.message,
     };
 
-    emailjs
-      .send('service_r8lthks', 'template_j4n102h', templateParams, 'QrK1DlzU_Ho0BMgKD')
-      .then(
-        (response) => {
-          toast.success('Message sent successfully!');
-        },
-        (err) => {
-          toast.error('Failed to send message. Please try again later.');
-        }
-      );
+    try {
+      const response = await emailjs.send('service_r8lthks', 'template_j4n102h', templateParams, 'QrK1DlzU_Ho0BMgKD');
+      console.log('SUCCESS!', response.status, response.text);
+      toast.success('Message sent successfully!');
+      // Reset form data after successful submission
+      setFormData({
+        name: '',
+        phone: '',
+        email: '',
+        message: '',
+      });
+    } catch (err) {
+      console.error('FAILED...', err);
+      toast.error('Failed to send message. Please try again later.');
+    }
   };
 
   return (
     <div>
-      <div
-        className="grid md:grid-cols-2 gap-16 items-center relative overflow-hidden p-8 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-3xl max-w-6xl mx-auto bg-white mt-6 mb-6 font-[sans-serif]"
-      >
+      <div className="grid md:grid-cols-2 gap-16 items-center relative overflow-hidden p-8 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-3xl max-w-6xl mx-auto bg-white mt-6 mb-6 font-[sans-serif]">
         <div>
           <h2 className="text-gray-800 text-3xl font-bold">Get In Touch</h2>
           <p className="text-sm text-gray-500 mt-4 leading-relaxed">
