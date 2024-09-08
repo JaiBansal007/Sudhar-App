@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { createUserWithEmailAndPassword ,GoogleAuthProvider, signInWithPopup} from 'firebase/auth';
+import { createUserWithEmailAndPassword ,GoogleAuthProvider, onAuthStateChanged, signInWithPopup} from 'firebase/auth';
 import { auth, db } from '@/firebase/config';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
@@ -19,7 +19,15 @@ export default function SignUp(){
     }else{
       setMatch(true);
     }
+    
   }, [confirmPassword]);
+  useEffect(()=>{
+    onAuthStateChanged(auth,(user)=>{
+      if(user){
+        router.push("/profile");
+      }
+    })
+  },[]);
     const handler = async () => {
     console.log(email, password);
     if(match){

@@ -19,13 +19,14 @@ export default function SignUp(){
     }else{
       setMatch(true);
     }
+    console.log("mcd page")
   }, [confirmPassword]);
     const handler = async () => {
     console.log(email, password);
     if(match){
       try {
         const res=await createUserWithEmailAndPassword(auth,email, password);
-        await setDoc(doc(db, "users", res.user.uid), {
+        await setDoc(doc(db, "mcd", res.user.uid), {
           email: email,
           password: password,
           id: res.user.uid,
@@ -37,7 +38,7 @@ export default function SignUp(){
           userpost: [],
         });
         toast.success("Successfully Logged in");
-        router.push("/profile");
+        router.push("profile");
       } catch (error) {
         toast.error("Invalid Credentials");
       }
@@ -47,7 +48,7 @@ export default function SignUp(){
     try {
       const res = await signInWithPopup(auth, googleauthprovider);
       console.log(res);
-      await setDoc(doc(db, "users", res.user.uid), {
+      await setDoc(doc(db, "mcd", res.user.uid), {
         email: res.user.email,
         password:"",
         id: res.user.uid,
@@ -58,7 +59,7 @@ export default function SignUp(){
         userpost: [],
       });
       toast.success("Successfully Logged in");
-      router.push("/profile");
+      router.push("profile");
     } catch (error) {
       toast.error("Login Failed");
       console.log(error);

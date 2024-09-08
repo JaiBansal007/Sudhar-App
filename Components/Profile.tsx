@@ -51,6 +51,7 @@ const Profile: React.FC = () => {
           if (userSnap.exists()) {
             const fetchedComplaints = userSnap.data().complaint || [];
             setComplaints(fetchedComplaints);
+            console.log(fetchedComplaints);
           }
         } catch (error) {
           console.error("Failed to fetch complaints", error);
@@ -66,7 +67,6 @@ const Profile: React.FC = () => {
   }, [showComplaints, userID]);
 
   const now = new Date();
-
   const getComplaintsByStatus = (status: "all" | "active" | "resolved") => {
     return complaints.filter((complaint) => status === "all" || complaint.status === "active"|| complaint.status === "resolved");
   };
@@ -123,7 +123,7 @@ const Profile: React.FC = () => {
                 : "Show Registered Complaints"}
             </button>
           </div>
-
+          
           {/* Complaints Section */}
           {showComplaints && (
             <div className="w-full mt-6 bg-white p-4 rounded-lg shadow-lg">
@@ -161,22 +161,33 @@ const Profile: React.FC = () => {
                         return (
                           <div key={complaint.id} className="border-t border-gray-200">
                             <div className="p-4">
-                              <h3 className="text-lg font-bold text-gray-900">{complaint.title}</h3>
-                              <p className="text-md text-gray-900">{complaint.description}</p>
+                              
                               {activeTab === "all"&& (
+                                <><h3 className="text-lg font-bold text-gray-900">{complaint.title}</h3>
+                                <p className="text-md text-gray-900">{complaint.description}</p>
                                 <p className="mt-2 text-sm text-gray-500">
-                                  Status: {complaint.status ? <span className="text-green-600 text-md">Resolved</span> :<span className="text-red-700 text-md">Active</span>}
+                                  Status: {complaint.status==='resolved' ? <span className="text-green-600 text-md">Resolved</span> :<span className="text-red-700 text-md">Active</span>}
                                 </p>
+                                <img src={complaint.imageurl} alt="" className="object-contain"/>
+                                </>
                               )}
-                              {activeTab === "resolved" &&(
+                              {activeTab === "resolved" &&complaint.status=='resolved'&&(
+                                <><h3 className="text-lg font-bold text-gray-900">{complaint.title}</h3>
+                                <p className="text-md text-gray-900">{complaint.description}</p>
                                 <p className="mt-2 text-sm text-gray-500">
-                                  Status: <span className="text-green-600 text-md">Resolved</span>
+                                  Status: {complaint.status==='resolved' && <span className="text-green-600 text-md">Resolved</span>}
                                 </p>
+                                <img src={complaint.imageurl} alt="" className="object-contain"/>
+                                </>
                               )}
-                              {activeTab === 'active' &&(
+                              {activeTab === 'active' &&complaint.status=='active'&&(
+                                <><h3 className="text-lg font-bold text-gray-900">{complaint.title}</h3>
+                                <p className="text-md text-gray-900">{complaint.description}</p>
                                 <p className="mt-2 text-sm text-gray-500">
-                                  Status: <span className="text-red-600 text-md">Active</span>
+                                  Status: {complaint.status==='active' && <span className="text-red-700 text-md">Active</span>}
                                 </p>
+                                <img src={complaint.imageurl} alt="" className="object-contain"/>
+                                </>
                               )}
 
                               {activeTab === "active" && diffDays > 3 && (

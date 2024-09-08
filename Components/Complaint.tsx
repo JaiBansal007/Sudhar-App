@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
+import  Upload  from '@/firebase/upload';
+import { set } from 'firebase/database';
 interface PredictionResult {
   text: string;
   color: string;
@@ -37,8 +39,15 @@ const Report: React.FC = () => {
   const [userID,setuserID]=useState("");
   const URL = "./my_model/";
   const [open, setOpen] = useState(false);
-
+  const [imageData,setimageData]=useState("");
   useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setuserID(user.uid);
+      }else{
+        router.push("/signin");
+      }
+    });
     const init = async () => {
       try {
         setLoading(true);
@@ -53,6 +62,7 @@ const Report: React.FC = () => {
         setLoading(false);
       }
     };
+
     init();
   }, []);
 
@@ -99,15 +109,20 @@ const Report: React.FC = () => {
     
   // }, [open]); // Start camera only when the "open" state is true
 
-  const captureImage = () => {
+  const captureImage = (e:any) => {
+    e.preventDefault();
     if (videoRef.current && canvasRef.current) {
       const context = canvasRef.current.getContext('2d');
       if (context) {
         context.drawImage(videoRef.current, 0, 0, 224, 224);
         const imageData = canvasRef.current.toDataURL('image/png');
         setImagePreviews((prev) => [...prev, imageData]);
+        imagePreviews.forEach((src, index) => {
+          if (index < 2) {
+            setimageData(src);
+          }
+        });
         setResults([]);
-
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
@@ -203,7 +218,6 @@ const Report: React.FC = () => {
       setLoading(false);
     }
   };
-
   const handleSubmit = async() => {
     if (formValid) {
       await onAuthStateChanged(auth, (user) => {
@@ -216,16 +230,27 @@ const Report: React.FC = () => {
       const user=doc(db,"users",userID);
     const usersnap=await getDoc(user);
     if(usersnap.exists()){
-          await updateDoc(user,{
-            complaint:arrayUnion({
-              time:new Date().toISOString(),
-              title:title,
-              description:description, 
-              location:address,
-              status:false,
-            })
-          });
-    }
+      updateDoc(user,{
+        complaint:arrayUnion({
+          id:Math.random().toString(36),
+          time:new Date().toISOString(),
+          title:title,
+          description:description, 
+          location:address,
+          status:"active",
+          imageurl:imageData
+        })
+      });
+      }
+
+      const somedata=await getDoc(doc(db,"users",userID));
+      if(somedata.exists()){
+        const currentbalance=Number(Number(somedata.data().balance)+100);
+        console.log(currentbalance);
+        await updateDoc(user,{
+          balance:currentbalance,
+        });
+      }
       toast.success("Complaint submitted successfully.");
       router.push("/");
     } else {
@@ -247,6 +272,7 @@ const Report: React.FC = () => {
               className="w-full mt-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              required
             />
           </div>
           <div>
@@ -256,6 +282,7 @@ const Report: React.FC = () => {
               className="w-full mt-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              required
             />
           </div>
 

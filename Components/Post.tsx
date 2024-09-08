@@ -37,6 +37,7 @@ export default function Post() {
 
         try {
             // Upload image to Firebase Storage and get the image URL
+            console.log(image);
             const imageUrl = await Upload(image);
 
             // Reference to the user's posts document
@@ -52,15 +53,6 @@ export default function Post() {
               })
             });
             
-            const user=doc(db,"users",userId);
-            const usersnap=await getDoc(user);
-            if(usersnap.exists()){
-              const currentbalance=Number(Number(usersnap.data().balance)+100);
-              console.log(currentbalance);
-              await updateDoc(user,{
-                balance:currentbalance,
-              });
-            }
             
             // Show success message and redirect to the community page
             router.push("/community");

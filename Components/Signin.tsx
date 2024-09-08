@@ -1,11 +1,12 @@
 "use client"
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {useRouter} from 'next/navigation'
-import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, db } from '@/firebase/config';
 import {toast} from 'react-toastify';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { on } from 'events';
 const googleauth=new GoogleAuthProvider();
 export default function Signin(){
   const [email, setEmail] = useState("");
@@ -20,6 +21,13 @@ export default function Signin(){
       toast.error("Invalid Credentials");
     }
   }
+  useEffect(()=>{
+    onAuthStateChanged(auth,(user)=>{
+      if(user){
+        router.push("/profile");
+      }
+    })
+  },[]);
   const signinwithgoogle = async () => {
     try {
       const res = await signInWithPopup(auth, googleauth);
