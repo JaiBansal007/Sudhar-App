@@ -75,11 +75,9 @@ const Home: React.FC = () => {
       {/* Testimonials Section */}
       <TestimonialsSection />
 
-      {/* Pricing Section */}
-      <PricingSection />
+      <AboutSection />
 
-      {/* Newsletter Subscription Section */}
-      <NewsletterSection />
+      
 
       {/* FAQ Section */}
       <FAQSection />
@@ -93,15 +91,19 @@ const Home: React.FC = () => {
   );
 };
 
-// Hero Section Component
 const HeroSection: React.FC = () => {
   return (
+    
     <section
       className="relative bg-cover bg-center h-[70vh] flex items-center justify-center"
-      style={{ backgroundImage: 'url(/1.png)' }}
+      style={{ 
+        backgroundImage: 'url(/1.png)', 
+        backgroundSize: 'contain', // Adjust background size to fit the image
+        backgroundPosition: 'center' // Ensure image is centered
+      }}
     >
       <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative z-10 text-center">
+      <div className="relative text-center">
         <h1 className="text-5xl font-extrabold text-white mb-4">Join Us in Keeping Our City Clean</h1>
         <p className="text-xl text-white mb-6">Make your city a better place with smart garbage detection technology.</p>
         <button
@@ -115,6 +117,7 @@ const HeroSection: React.FC = () => {
   );
 };
 
+
 // Features Section Component
 const FeaturesSection: React.FC = () => {
   return (
@@ -123,9 +126,19 @@ const FeaturesSection: React.FC = () => {
         <h2 className="text-4xl font-bold text-gray-800 mb-8">Our Key Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { icon: "🚀", title: "Fast Detection", description: "AI-driven fast and accurate garbage detection." },
-            { icon: "🔍", title: "Real-Time Monitoring", description: "Monitor city cleanliness in real-time." },
-            { icon: "📈", title: "Data Analytics", description: "Advanced analytics for cleaner city planning." }
+            { icon: "🚀", title: "Fast Detection", description: "AI-driven fast and accurate garbage and potholes detection." },
+            {
+              "icon": "🎁",
+              "title": "Voucher Redemption",
+              "description": "Redeem your points for exciting rewards and discounts."
+            },
+            
+            {
+              "icon": "🗨️",
+              "title": "Community Posts",
+              "description": "Share updates and engage with others to improve the city."
+            }
+            
           ].map((feature, index) => (
             <div key={index} className="bg-white p-6 rounded-lg shadow-md">
               <div className="text-5xl mb-4">{feature.icon}</div>
@@ -166,9 +179,9 @@ const TestimonialsSection: React.FC = () => {
         <h2 className="text-4xl font-bold text-gray-800 mb-8">What Our Users Say</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { name: "John Doe", feedback: "Fantastic app! The city has never been cleaner." },
-            { name: "Jane Smith", feedback: "Real-time monitoring is a game-changer!" },
-            { name: "Michael Lee", feedback: "Data analytics have greatly improved our city's cleanliness strategy." }
+            { name: "Nayan Jindal", feedback: "Fantastic app! The city has never been cleaner." },
+            { name: "Jai Bansal", feedback: "Voucher in exchange of points are gamechanger." },
+            { name: "Dhruv Tuteja", feedback: "Community tab is just too good." }
           ].map((testimonial, index) => (
             <div key={index} className="bg-white p-6 rounded-lg shadow-md">
               <p className="text-xl text-gray-600 mb-4">"{testimonial.feedback}"</p>
@@ -181,59 +194,48 @@ const TestimonialsSection: React.FC = () => {
   );
 };
 
-// Pricing Section Component
-const PricingSection: React.FC = () => {
+const AboutSection: React.FC = () => {
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-6xl mx-auto px-4 lg:px-0 text-center">
-        <h2 className="text-4xl font-bold text-gray-800 mb-8">Our Pricing Plans</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { plan: "Basic", price: "$9.99", features: ["Feature 1", "Feature 2", "Feature 3"] },
-            { plan: "Pro", price: "$19.99", features: ["Feature 1", "Feature 2", "Feature 3", "Feature 4"] },
-            { plan: "Enterprise", price: "Contact Us", features: ["Feature 1", "Feature 2", "Feature 3", "Feature 4", "Feature 5"] }
-          ].map((pricing, index) => (
-            <div key={index} className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">{pricing.plan}</h3>
-              <p className="text-xl text-gray-600 mb-4">{pricing.price}</p>
-              <ul className="text-gray-600 mb-4">
-                {pricing.features.map((feature, idx) => (
-                  <li key={idx} className="mb-2">{feature}</li>
-                ))}
-              </ul>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">Choose Plan</button>
+    <section className="bg-white py-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+          {/* Text Section */}
+          <div className="max-w-lg">
+            <h2 className="text-4xl font-bold text-gray-900 sm:text-5xl">
+              About Us
+            </h2>
+            <p className="mt-6 text-gray-600 text-lg leading-relaxed">
+              We are committed to making our cities cleaner and healthier using innovative
+              technology. Our platform empowers citizens to report waste issues in real-time,
+              and we work alongside local governments to ensure a swift response. Together, 
+              we can create a more sustainable future for everyone.
+            </p>
+          </div>
+
+          {/* Image Section */}
+          <div className="mt-8 md:mt-0">
+            <div className="relative overflow-hidden rounded-lg shadow-lg">
+              <img
+                src="https://images.unsplash.com/photo-1531973576160-7125cd663d86"
+                alt="About Us"
+                width={600}
+                height={400}
+                className="object-cover w-full h-full transform transition duration-500 hover:scale-105"
+              />
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>
-  );
-};
-
-// Newsletter Subscription Section Component
-const NewsletterSection: React.FC = () => {
-  return (
-    <section className="py-16 bg-gray-100">
-      <div className="max-w-3xl mx-auto px-4 lg:px-0 text-center">
-        <h2 className="text-4xl font-bold text-gray-800 mb-4">Subscribe to Our Newsletter</h2>
-        <p className="text-lg text-gray-600 mb-6">Stay updated with the latest news and offers.</p>
-        <input
-          type="email"
-          className="border border-gray-300 p-3 rounded-lg w-full mb-4"
-          placeholder="Enter your email"
-        />
-        <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg">Subscribe</button>
-      </div>
-    </section>
-  );
+  );
 };
 
 // FAQ Section Component
 const FAQSection: React.FC = () => {
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-2xl mx-auto px-4 lg:px-0">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Frequently Asked Questions</h2>
+    <section className="py-16 bg-blue-50">
+      <div className="max-w-4xl mx-auto px-4 lg:px-0">
+        <h2 className="text-4xl font-bold text-center text-blue-800 mb-10">Frequently Asked Questions</h2>
         <div className="space-y-4">
           {faqData.map((faq, index) => (
             <FAQItem key={index} question={faq.question} answer={faq.answer} />
@@ -243,31 +245,42 @@ const FAQSection: React.FC = () => {
     </section>
   );
 };
-
-// FAQ Item Component
+ 
+// Enhanced FAQ Item Component
 const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
   const [isOpen, setIsOpen] = React.useState(false);
-
+ 
   return (
-    <div className="border border-gray-200 rounded-md">
+    <div className="border border-gray-300 rounded-lg shadow-sm bg-white">
       <button
-        className="w-full text-left p-4 text-gray-800 font-medium focus:outline-none"
+        className="w-full text-left p-4 text-gray-900 font-semibold focus:outline-none flex justify-between items-center transition duration-200 ease-in-out"
         onClick={() => setIsOpen(!isOpen)}
       >
         {question}
+        <svg
+          className={`w-5 h-5 text-gray-700 transition-transform duration-300 transform ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
       </button>
-      {isOpen && (
-        <div className="p-4 text-gray-600 border-t border-gray-200">
+      <div
+        className={`overflow-hidden transition-all duration-150 ease-in-out ${isOpen ? 'max-h-screen' : 'max-h-0'}`}
+      >
+        <div className="p-4 text-gray-800 border-t border-gray-300">
           {answer}
         </div>
-      )}
+      </div>
     </div>
   );
 };
-
-// Sample Data
+ 
+// Sample Data (no change)
 const faqData = [
-  { question: 'How does garbage detection work?', answer: 'We use AI and machine learning models to detect garbage on streets and notify the cleaning teams.' },
+  { question: 'How does garbage and road detection work?', answer: 'We use AI and machine learning models to detect garbage and potholes on streets and notify the cleaning and reparing teams.' },
   { question: 'How can I participate in cleaning?', answer: 'You can join our volunteer program or report garbage through our complaint system.' },
   { question: 'What are the benefits of using this system?', answer: 'It helps in faster garbage disposal, cleaner streets, and a healthier environment.' },
   { question: 'How can I report a complaint?', answer: 'Simply click on the "Report a Complaint" button and fill out the necessary details.' },
