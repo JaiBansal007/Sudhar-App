@@ -1,5 +1,5 @@
 "use client";
-
+ 
 import React, { useEffect, useState } from 'react';
 import Navbar from '@/Components/Navbar'; // Import Navbar
 import Footer from '@/Components/Footer'; // Import Footer
@@ -8,13 +8,13 @@ import app, { auth, db } from "@/firebase/config"; // Import Firebase config
 import { collection, getDocs, getFirestore } from 'firebase/firestore'; // Import Firestore
 import { useRouter } from "next/navigation"; // Import Next.js router
 import { onAuthStateChanged } from "firebase/auth"; // Import Firebase auth
-
+ 
 const firestore = getFirestore(app);
-
+ 
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<any[]>([]); // State to store posts
   const router = useRouter();
-
+ 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -24,7 +24,7 @@ const Home: React.FC = () => {
           id: doc.id,
           ...doc.data(),
         }));
-
+ 
         const formatUserPosts = (rawPosts: any[]): any[] => {
           const combinedPosts = rawPosts.flatMap(user =>
             user.userpost.map((post: any) => ({
@@ -42,83 +42,136 @@ const Home: React.FC = () => {
           );
           return combinedPosts;
         };
-
+ 
         const combinedPostsArray = formatUserPosts(userRecord);
-        
+ 
         // Sort posts by creation date (most recent first)
         combinedPostsArray.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
-
+ 
         // Get the three most recent posts
         setPosts(combinedPostsArray.slice(0, 3));
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
     };
-
+ 
     fetchPosts();
   }, []);
-
+ 
   return (
     <div className="min-h-screen bg-white text-black">
       {/* Navbar */}
       <Navbar />
-
+ 
       {/* Hero Section */}
       <HeroSection />
-
+ 
       {/* Features Section */}
       <FeaturesSection />
-
+ 
       {/* Community Posts Section */}
       <CommunityPosts posts={posts} />
-
+ 
       {/* Testimonials Section */}
       <TestimonialsSection />
-
+ 
       <AboutSection />
-
-      
-
+ 
       {/* FAQ Section */}
       <FAQSection />
-
+ 
       {/* Chatbot */}
       <Chatbot />
-
+ 
       {/* Footer */}
       <Footer />
     </div>
   );
 };
-
+ 
 const HeroSection: React.FC = () => {
+  const images = [
+    '/1.png',   // Add your image paths here
+    'https://png.pngtree.com/png-clipart/20230824/original/pngtree-waste-management-concept-activist-people-picture-image_8422764.png',
+    'https://previews.123rf.com/images/surfupvector/surfupvector2009/surfupvector200900152/154889265-trash-pickup-worker-cleaning-dustbin-at-truck-man-carrying-trash-in-plastic-bag-flat-vector.jpg',
+  ];
+ 
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+ 
+  // Function to handle next image
+  const nextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+  };
+ 
+  // Function to handle previous image
+  const prevImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
+  };
+ 
+  // Automatically change images every 2 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      nextImage();
+    }, 2000);
+ 
+    return () => clearInterval(interval); // Cleanup the interval on component unmount
+  }, []);
+ 
   return (
-    
-    <section
-      className="relative bg-cover bg-center h-[70vh] flex items-center justify-center"
-      style={{ 
-        backgroundImage: 'url(/1.png)', 
-        backgroundSize: 'contain', // Adjust background size to fit the image
-        backgroundPosition: 'center' // Ensure image is centered
-      }}
-    >
+    <section className="relative bg-cover bg-center h-[70vh] flex items-center justify-center">
+      {/* Image background */}
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-all duration-500"
+        style={{ 
+          backgroundImage: `url(${images[currentImageIndex]})`,
+          backgroundSize: 'contain',
+          backgroundPosition: 'center' 
+        }}
+      />
       <div className="absolute inset-0 bg-black opacity-50"></div>
+ 
+      {/* Hero Text */}
       <div className="relative text-center">
         <h1 className="text-5xl font-extrabold text-white mb-4">Join Us in Keeping Our City Clean</h1>
         <p className="text-xl text-white mb-6">Make your city a better place with smart garbage detection technology.</p>
         <button
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg"
+          className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105"
           onClick={() => window.location.href = '/complaint'}
         >
           Report a Complaint
         </button>
       </div>
+ 
+      {/* Navigation arrows */}
+      <button
+        className="absolute left-4 text-white text-4xl z-20 bg-gray-700 rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
+        onClick={prevImage}
+      >
+        &#10094;
+      </button>
+      <button
+        className="absolute right-4 text-white text-4xl z-20 bg-gray-700 rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
+        onClick={nextImage}
+      >
+        &#10095;
+      </button>
+ 
+      {/* Dots to show the current image */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+        {images.map((_, index) => (
+          <span
+            key={index}
+            className={`w-3 h-3 rounded-full ${currentImageIndex === index ? 'bg-white' : 'bg-gray-400'} transition-colors duration-300`}
+          />
+        ))}
+      </div>
     </section>
   );
 };
-
-
-// Features Section Component
+ 
+// Features Section Component with Hover Effects
 const FeaturesSection: React.FC = () => {
   return (
     <section className="py-16 bg-gray-100">
@@ -127,20 +180,10 @@ const FeaturesSection: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             { icon: "🚀", title: "Fast Detection", description: "AI-driven fast and accurate garbage and potholes detection." },
-            {
-              "icon": "🎁",
-              "title": "Voucher Redemption",
-              "description": "Redeem your points for exciting rewards and discounts."
-            },
-            
-            {
-              "icon": "🗨️",
-              "title": "Community Posts",
-              "description": "Share updates and engage with others to improve the city."
-            }
-            
+            { icon: "🎁", title: "Voucher Redemption", description: "Redeem your points for exciting rewards and discounts." },
+            { icon: "🗨️", title: "Community Posts", description: "Share updates and engage with others to improve the city." }
           ].map((feature, index) => (
-            <div key={index} className="bg-white p-6 rounded-lg shadow-md">
+            <div key={index} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transform transition-transform duration-200 hover:scale-105">
               <div className="text-5xl mb-4">{feature.icon}</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-2">{feature.title}</h3>
               <p className="text-gray-600">{feature.description}</p>
@@ -151,15 +194,15 @@ const FeaturesSection: React.FC = () => {
     </section>
   );
 };
-
-// Community Posts Section with Vertical Scroll
+ 
+// Community Posts Section with Hover Effects
 const CommunityPosts: React.FC<{ posts: any[] }> = ({ posts }) => {
   return (
     <section className="py-12 px-4 lg:px-16 bg-white">
       <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Latest from the Community</h2>
       <div className="max-w-2xl mx-auto h-96 overflow-y-auto bg-gray-100 p-6 rounded-md shadow-md">
         {posts.map((post, index) => (
-          <div key={index} className="bg-white p-4 mb-4 rounded-md shadow">
+          <div key={index} className="bg-white p-4 mb-4 rounded-md shadow hover:shadow-lg transition-shadow duration-200">
             <img src={post.imageUrl} alt={post.title} className="w-full h-64 object-cover rounded-md mb-4" />
             <h3 className="text-xl font-bold text-blue-600">{post.title}</h3>
             <p className="text-gray-600 mb-4">{post.description}</p>
@@ -170,7 +213,7 @@ const CommunityPosts: React.FC<{ posts: any[] }> = ({ posts }) => {
     </section>
   );
 };
-
+ 
 // Testimonials Section Component
 const TestimonialsSection: React.FC = () => {
   return (
@@ -181,9 +224,9 @@ const TestimonialsSection: React.FC = () => {
           {[
             { name: "Nayan Jindal", feedback: "Fantastic app! The city has never been cleaner." },
             { name: "Jai Bansal", feedback: "Voucher in exchange of points are gamechanger." },
-            { name: "Dhruv Tuteja", feedback: "Community tab is just too good." }
+            { name: "Rohan Jhanwar", feedback: "Community tab is just too good." }
           ].map((testimonial, index) => (
-            <div key={index} className="bg-white p-6 rounded-lg shadow-md">
+            <div key={index} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transform transition-transform duration-200 hover:scale-105">
               <p className="text-xl text-gray-600 mb-4">"{testimonial.feedback}"</p>
               <h3 className="text-lg font-bold text-gray-800">{testimonial.name}</h3>
             </div>
@@ -193,7 +236,7 @@ const TestimonialsSection: React.FC = () => {
     </section>
   );
 };
-
+ 
 const AboutSection: React.FC = () => {
   return (
     <section className="bg-white py-16">
@@ -211,7 +254,7 @@ const AboutSection: React.FC = () => {
               we can create a more sustainable future for everyone.
             </p>
           </div>
-
+ 
           {/* Image Section */}
           <div className="mt-8 md:mt-0">
             <div className="relative overflow-hidden rounded-lg shadow-lg">
@@ -227,10 +270,10 @@ const AboutSection: React.FC = () => {
         </div>
       </div>
     </section>
-  );
+  );
 };
-
-// FAQ Section Component
+ 
+// FAQ Section Component with Functional Dropdown
 const FAQSection: React.FC = () => {
   return (
     <section className="py-16 bg-blue-50">
@@ -246,14 +289,14 @@ const FAQSection: React.FC = () => {
   );
 };
  
-// Enhanced FAQ Item Component
+// Enhanced FAQ Item Component with Hover and Click Functionality
 const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
   const [isOpen, setIsOpen] = React.useState(false);
  
   return (
     <div className="border border-gray-300 rounded-lg shadow-sm bg-white">
       <button
-        className="w-full text-left p-4 text-gray-900 font-semibold focus:outline-none flex justify-between items-center transition duration-200 ease-in-out"
+        className="w-full text-left p-4 text-gray-900 font-semibold focus:outline-none flex justify-between items-center transition duration-200 ease-in-out hover:bg-gray-100"
         onClick={() => setIsOpen(!isOpen)}
       >
         {question}
@@ -267,9 +310,7 @@ const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, ans
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      <div
-        className={`overflow-hidden transition-all duration-150 ease-in-out ${isOpen ? 'max-h-screen' : 'max-h-0'}`}
-      >
+      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-screen' : 'max-h-0'}`}>
         <div className="p-4 text-gray-800 border-t border-gray-300">
           {answer}
         </div>
@@ -278,12 +319,13 @@ const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, ans
   );
 };
  
-// Sample Data (no change)
+// Sample Data for FAQ Section
 const faqData = [
-  { question: 'How does garbage and road detection work?', answer: 'We use AI and machine learning models to detect garbage and potholes on streets and notify the cleaning and reparing teams.' },
+  { question: 'How does garbage and road detection work?', answer: 'We use AI and machine learning models to detect garbage and potholes on streets and notify the cleaning and repairing teams.' },
   { question: 'How can I participate in cleaning?', answer: 'You can join our volunteer program or report garbage through our complaint system.' },
   { question: 'What are the benefits of using this system?', answer: 'It helps in faster garbage disposal, cleaner streets, and a healthier environment.' },
   { question: 'How can I report a complaint?', answer: 'Simply click on the "Report a Complaint" button and fill out the necessary details.' },
 ];
-
+ 
 export default Home;
+ 
