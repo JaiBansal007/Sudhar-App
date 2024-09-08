@@ -103,8 +103,7 @@ const ReceivedComplaints: React.FC = () => {
     });
     fetchPosts(); // Fetch posts when component mounts
   },[]);
-
-
+  
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4 sm:px-6 lg:px-8">
       <h1 className="text-4xl font-bold text-gray-900 mb-8">Received Complaints</h1>

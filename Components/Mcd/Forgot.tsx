@@ -44,20 +44,23 @@ export default function Forgot(){
       }
     }
 
-    useEffect(() => {
-      if (password === confirmPassword) {
-        setMatch(true);
-      } else {
-        setMatch(false);
-      }
-    }, [password, confirmPassword]);
+    // useEffect(() => {
+    //   if (password === confirmPassword) {
+    //     setMatch(true);
+    //   } else {
+    //     setMatch(false);
+    //   }
+    // }, [password, confirmPassword]);
 
     useEffect(() => {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          router.push("/profile");
-        }
-      });
+      toast.error("Access Denied");
+      router.push('/mcd/signin');
+      console.log("mcd page")
+      // onAuthStateChanged(auth, (user) => {
+      //   if (user) {
+      //     router.push("/profile");
+      //   }
+      // });
     }, []);
 
     return (

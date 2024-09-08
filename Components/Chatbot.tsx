@@ -147,7 +147,7 @@ export default function Chatbot() {
       } else if (suggestion === 'View Past Complaints') {
         const complaints = await fetchComplaints(userId);
         const complaintsMessage = complaints.length
-          ? complaints.map((c:any) => `Title: ${c.title}\nStatus: ${c.status}\nDescription: ${c.description}`).join('\n\n')
+          ? complaints.map((c:any) => `Title: ${c.title} \n Status: ${c.status} \n Description: ${c.description} `).join('\n\n')
           : 'You have no registered complaints.';
         addMessage(complaintsMessage, 'incoming');
       } else {

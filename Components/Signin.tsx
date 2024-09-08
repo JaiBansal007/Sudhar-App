@@ -6,19 +6,20 @@ import { GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, sig
 import { auth, db } from '@/firebase/config';
 import {toast} from 'react-toastify';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { on } from 'events';
 const googleauth=new GoogleAuthProvider();
 export default function Signin(){
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const router = useRouter();
-  const signinusingemail=async()=>{
+  const signinusingemail=async(e:any)=>{
+    e.preventDefault();
     try {
       const res=await signInWithEmailAndPassword(auth,email, password);
       toast.success("Successfully Logged in");
       router.push("/profile");
     } catch (error) {
       toast.error("Invalid Credentials");
+      console.log(error);
     }
   }
   useEffect(()=>{
@@ -99,7 +100,7 @@ export default function Signin(){
                     router.push("/mcd/signin");
                   }}
       type="submit"
-      className="w-full sm:w-44 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+      className="sm:w-44 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
     >
       MCD
     </button>

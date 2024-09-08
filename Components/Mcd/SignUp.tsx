@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { createUserWithEmailAndPassword ,GoogleAuthProvider, onAuthStateChanged, signInWithPopup} from 'firebase/auth';
 import { auth, db } from '@/firebase/config';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 const googleauthprovider=new GoogleAuthProvider();
@@ -16,7 +16,11 @@ export default function SignUp(){
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        router.push("/mcd/profile");
+        const userref=doc(db, "mcd", user.uid);
+       const userDoc = await getDoc(userref);
+        if(userDoc.exists()){
+          router.push("/mcd/profile");
+        }
       }
     });
     if(password!==confirmPassword){
@@ -28,41 +32,42 @@ export default function SignUp(){
   }, [confirmPassword]);
     const handler = async () => {
     console.log(email, password);
-    if(match){
-      try {
-        const res=await createUserWithEmailAndPassword(auth,email, password);
-        await setDoc(doc(db, "mcd", res.user.uid), {
-          email: email,
-          password: password,
-          id: res.user.uid,
-        });
-        toast.success("Successfully Logged in");
-        router.push("/mcd/profile");
-      } catch (error) {
-        toast.error("Invalid Credentials");
-      }
-    }
+    toast.error("Access Denied");
+    router.push('/mcd/signin');
+    // if(match){
+    //   try {
+    //     const res=await createUserWithEmailAndPassword(auth,email, password);
+    //     await setDoc(doc(db, "mcd", res.user.uid), {
+    //       email: email,
+    //       password: password,
+    //       id: res.user.uid,
+    //     });
+    //     toast.success("Successfully Logged in");
+    //     router.push("/mcd/profile");
+    //   } catch (error) {
+    //     toast.error("Invalid Credentials");
+    //   }
+    // }
   };
   const googleregister = async () => {
-    try {
-      const res = await signInWithPopup(auth, googleauthprovider);
-      console.log(res);
-      await setDoc(doc(db, "mcd", res.user.uid), {
-        email: res.user.email,
-        password:"",
-        id: res.user.uid,
-        orders: [],
-        balance: 0,
-      });
-      await setDoc(doc(db, "post", res.user.uid), {
-        userpost: [],
-      });
-      toast.success("Successfully Logged in");
-      router.push("/mcd/profile");
-    } catch (error) {
-      toast.error("Login Failed");
-      console.log(error);
-    }
+    toast.error("Access Denied");
+    router.push('/mcd/signin');
+    // try {
+    //   const res = await signInWithPopup(auth, googleauthprovider);
+    //   const user= res.user;
+    //   const userref=doc(db, "mcd", user.uid);
+    //   const userDoc = await getDoc(userref);
+    //   if(userDoc.exists()){
+    //     toast.success("Successfully Logged in");
+    //     router.push("/mcd/profile");
+
+    //   }else{
+    //     router.push("/mcd/signup");
+    //     toast.error("Access Denied");
+    //   }
+    // } catch (error) {
+    //   toast.error("Login Failed");
+    // }
   };
     return (
       <div>

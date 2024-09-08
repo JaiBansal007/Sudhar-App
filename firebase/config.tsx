@@ -37,7 +37,7 @@ export const useFirebase = () => {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app);
-export const auth = getAuth();
+export const auth = getAuth(app);
 export const database = getDatabase();
 export const db = getFirestore(app);
 // FirebaseProvider to wrap around components

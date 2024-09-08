@@ -12,11 +12,13 @@ interface Post {
   title: string;
   description: string;
   createdAt: string; // or Date
+  userId: string;
+  username:string;
 }
 export default function Community() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPost, setSelectedPost] = useState<Post|null>(null); // State for selected post
-  const [posts, setPosts] = useState<any[]>([]); // State to store posts
+  const [posts, setPosts] = useState<Post[]>([]); // State to store posts
   const [userId,setuserId]=useState("");
   const router=useRouter();
   useEffect(() => {
@@ -46,14 +48,13 @@ export default function Community() {
                 title: post.title,
                 description: post.description,
                 imageUrl: post.imageUrl,
-                // Convert Firestore Timestamp to Date first, then format it
                 createdAt: post.createdAt ? 
                     new Date(post.createdAt.seconds * 1000).toLocaleDateString('en-IN', { 
                         day: 'numeric', 
                         month: 'long', 
                         year: 'numeric' 
                     }) : 'N/A', // Handle cases where createdAt might be missing
-                userId: user.id  // Optionally include the user ID for reference
+                userId: user.id,  // Optionally include the user ID for reference
             }))
         );
         console.log('Combined posts:', combinedPosts);
