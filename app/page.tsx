@@ -146,20 +146,20 @@ const HeroSection: React.FC = () => {
  
       {/* Navigation arrows */}
       <button
-        className="absolute left-4 text-white text-4xl z-20 bg-gray-700 rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
+        className="absolute left-4 text-white text-4xl bg-gray-700 rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
         onClick={prevImage}
       >
         &#10094;
       </button>
       <button
-        className="absolute right-4 text-white text-4xl z-20 bg-gray-700 rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
+        className="absolute right-4 text-white text-4xl bg-gray-700 rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
         onClick={nextImage}
       >
         &#10095;
       </button>
  
       {/* Dots to show the current image */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
         {images.map((_, index) => (
           <span
             key={index}

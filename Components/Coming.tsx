@@ -9,11 +9,12 @@ const ComingSoon: React.FC = () => {
       icon: 'https://cdn-icons-png.flaticon.com/512/3867/3867424.png',
     },
     {
-      name: 'Freelance Urban Maintenance Marketplace',
+      name: 'Aadhaar Authentication for Login',
       description:
-        'Develop a marketplace within your platform where users can hire local freelancers or small businesses to fix minor issues directly.',
-      icon: 'https://cdn-icons-png.flaticon.com/512/3464/3464493.png',
+        'Integrating Aadhaar authentication as a login option on our platform to provide users with a secure and seamless login experience.',
+      icon: 'https://cdn-icons-png.flaticon.com/512/3050/3050496.png', // Icon representing secure login or authentication
     },
+    
     {
       name: 'Eco-Friendly Product Partnerships',
       description:
