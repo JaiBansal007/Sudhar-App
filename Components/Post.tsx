@@ -13,7 +13,7 @@ export default function Post() {
     const [description, setDescription] = useState("");
     const [image, setImage] = useState(null);
     const [userId, setUserId] = useState("");
-    const [imagePreview, setImagePreview] = useState(null); // State to hold image preview URL
+    const [imagePreview, setImagePreview] = useState<string|null>(null); // State to hold image preview URL
     const router = useRouter();
 
     // Handle image selection and preview

@@ -7,9 +7,15 @@ import { collection, getDocs, getFirestore, orderBy, query } from 'firebase/fire
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 const firestore=getFirestore(app);
+interface Post {
+  imageUrl: string;
+  title: string;
+  description: string;
+  createdAt: string; // or Date
+}
 export default function Community() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPost, setSelectedPost] = useState(null); // State for selected post
+  const [selectedPost, setSelectedPost] = useState<Post|null>(null); // State for selected post
   const [posts, setPosts] = useState<any[]>([]); // State to store posts
   const [userId,setuserId]=useState("");
   const router=useRouter();

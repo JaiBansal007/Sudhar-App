@@ -151,7 +151,7 @@ const Profile: React.FC = () => {
                     <p className="text-center text-gray-600">Loading complaints...</p>
                   ) : (
                     <>
-                      {getComplaintsByStatus(activeTab).map((complaint) => {
+                      {getComplaintsByStatus(activeTab).map((complaint:any) => {
                         console.log(activeTab);
                         const complaintDate = new Date(complaint.createdAt);
                         const diffDays = Math.floor(

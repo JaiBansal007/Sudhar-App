@@ -16,15 +16,17 @@ export default function Chatbot() {
   ]);
 
   const chatInputRef = useRef(null);
-  const chatboxRef = useRef(null);
+  const chatboxRef = useRef<HTMLUListElement | null>(null); // Refers to a <ul> element
   const router = useRouter();
-
   useEffect(() => {
     const chatbox = chatboxRef.current;
     if (chatbox) {
-      chatbox.scrollTop = chatbox.scrollHeight;
+      // Ensure scrollHeight exists, otherwise fall back to 0
+      chatbox.scrollTop = chatbox.scrollHeight ?? 0;
     }
   }, [chatMessages]);
+  
+  
 
   const handleSendMessage = () => {
     if (userMessage.trim() === '') return;
@@ -81,7 +83,6 @@ export default function Chatbot() {
     setChatMessages((prevMessages) => {
       const lastMessage = prevMessages[prevMessages.length - 1];
       lastMessage.message = message;
-      lastMessage.isError = isError;
       lastMessage.suggestions = suggestions;
       return [...prevMessages];
     });
@@ -94,8 +95,11 @@ export default function Chatbot() {
     if (userSnap.exists()) {
       const { balance, orders } = userSnap.data();
       const sortedTransactions = orders
-        ? orders.sort((a: any, b: any) => new Date(b.time) - new Date(a.time)).slice(0, 3)
-        : [];
+  ? orders.sort((a: { time: string | Date }, b: { time: string | Date }) => 
+      new Date(b.time).getTime() - new Date(a.time).getTime()
+    ).slice(0, 3)
+  : [];
+
       return { balance, transactions: sortedTransactions };
     }
     return { balance: 0, transactions: [] };
@@ -143,7 +147,7 @@ export default function Chatbot() {
       } else if (suggestion === 'View Past Complaints') {
         const complaints = await fetchComplaints(userId);
         const complaintsMessage = complaints.length
-          ? complaints.map(c => `Title: ${c.title}\nStatus: ${c.status}\nDescription: ${c.description}`).join('\n\n')
+          ? complaints.map((c:any) => `Title: ${c.title}\nStatus: ${c.status}\nDescription: ${c.description}`).join('\n\n')
           : 'You have no registered complaints.';
         addMessage(complaintsMessage, 'incoming');
       } else {

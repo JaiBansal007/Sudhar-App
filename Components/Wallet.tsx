@@ -4,7 +4,9 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-
+interface Transaction {
+  time: string;
+}
 const Wallet: React.FC = () => {
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [userId, setUserId] = useState("");
@@ -26,7 +28,7 @@ const Wallet: React.FC = () => {
           setCoin(fetchedBalance);
 
           // Sort transactions by time (most recent first) and slice to get the last 3 transactions
-          const sortedTransactions = fetchedTransactions.sort((a, b) => new Date(b.time) - new Date(a.time));
+          const sortedTransactions = fetchedTransactions.sort((a: { time: string | Date }, b: { time: string | Date }) => new Date(b.time).getTime() - new Date(a.time).getTime());
           setTransactions(sortedTransactions);
         }
       } else {
@@ -76,7 +78,7 @@ const Wallet: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {transactions.map((transaction, index) => (
+                  {transactions.map((transaction:any, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.time.substring(0, 10)}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.voucherName}</td>

@@ -110,7 +110,7 @@ const ReceivedComplaints: React.FC = () => {
       <h1 className="text-4xl font-bold text-gray-900 mb-8">Received Complaints</h1>
 
       <div className="w-full max-w-3xl space-y-6">
-        {complaints.map((complaint) => (
+        {complaints.map((complaint:any) => (
           <div
             key={complaint.id}
             className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-row items-center p-6"
