@@ -87,7 +87,6 @@ export default function Chatbot() {
     });
   };
 
-  // Fetch wallet details
   const fetchWalletDetails = async (userId: string) => {
     const userRef = doc(db, "users", userId);
     const userSnap = await getDoc(userRef);
@@ -102,7 +101,17 @@ export default function Chatbot() {
     return { balance: 0, transactions: [] };
   };
 
-  // Handle suggestion clicks
+  const fetchComplaints = async (userId: string) => {
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const { complaint } = userSnap.data();
+      return complaint || [];
+    }
+    return [];
+  };
+
   const handleSuggestionClick = async (suggestion: string) => {
     setChatMessages((prevMessages) => [
       ...prevMessages,
@@ -112,7 +121,7 @@ export default function Chatbot() {
     setTimeout(async () => {
       const user = auth.currentUser;
       if (!user) {
-        router.push('/login');
+        router.push('/signin');
         return;
       }
 
@@ -122,18 +131,27 @@ export default function Chatbot() {
         router.push('/complaint');
       } else if (suggestion === 'Open Wallet') {
         const { balance, transactions } = await fetchWalletDetails(userId);
-        const walletMessage = `Available Coins: ${balance} \n Latest Transactions:\n` +
-          transactions.map((t: any) => `${t.time.substring(0, 10)} - ${t.voucherName}: ${t.voucherPrice}`).join('\n');
+        
+        const walletMessage =
+          `Available Coins: ${balance}\n\n` + // Ensure new line after balance
+          `Latest Transactions:\n` + // Start transactions on a new line
+          transactions.map((t: any) => `${t.time.substring(0, 10)} - ${t.voucherName}: ${t.voucherPrice}`).join('\n'); // Each transaction on a new line
+      
         addMessage(walletMessage, 'incoming');
       } else if (suggestion === 'Contact Us') {
         router.push('/contact');
+      } else if (suggestion === 'View Past Complaints') {
+        const complaints = await fetchComplaints(userId);
+        const complaintsMessage = complaints.length
+          ? complaints.map(c => `Title: ${c.title}\nStatus: ${c.status}\nDescription: ${c.description}`).join('\n\n')
+          : 'You have no registered complaints.';
+        addMessage(complaintsMessage, 'incoming');
       } else {
         addMessage(`You selected "${suggestion}"`, 'incoming', generateSuggestions(''));
       }
     }, 600);
   };
 
-  // Toggle the chatbot display
   const toggleChatbot = () => {
     setShowChatbot((prev) => !prev);
   };
@@ -146,18 +164,23 @@ export default function Chatbot() {
       </Head>
 
       {/* Chatbot toggle button */}
-      <button 
-        onClick={toggleChatbot}
-        className="fixed right-4 bottom-4 p-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg text-white hover:shadow-xl hover:scale-105 transition-transform ease-in-out duration-300"
-      >
-        <span className="material-symbols-outlined">
-          {showChatbot ? 'close' : 'chat'}
-        </span>
-      </button>
+      <button
+  onClick={toggleChatbot}
+  className="fixed right-4 bottom-4 p-0 w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg hover:shadow-xl hover:scale-105 transition-transform ease-in-out duration-300 flex items-center justify-center overflow-hidden"
+>
+  <img 
+    src="/4.png"  // Static image path that does not change
+    alt="Sudhaar Mitar"
+    className="w-20 h-20 transform translate-y-2 rounded-full object-contain" // Increased size and adjusted position
+  />
+</button>
+
+
+
 
       {/* Chatbot container */}
       {showChatbot && (
-        <div className="fixed right-4 bottom-20 w-96 bg-white rounded-xl shadow-2xl overflow-hidden transition-transform transform scale-100 opacity-100">
+        <div className="fixed right-4 bottom-20 w-72 md:w-80 lg:w-96 bg-white rounded-xl shadow-2xl overflow-hidden transition-transform transform scale-100 opacity-100">
           <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex justify-between items-center rounded-t-xl shadow-sm">
             <h2 className="font-semibold">Assistant</h2>
           </header>

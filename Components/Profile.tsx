@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/firebase/config";
 import { useRouter } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
+import Link from "next/link";
 
 interface Complaint {
   id: string;
@@ -14,6 +13,7 @@ interface Complaint {
   photos: string[];
   status: "active" | "resolved";
   createdAt: string; // Date string
+  description: string; // Ensure description is included
 }
 
 const Profile: React.FC = () => {
@@ -68,7 +68,7 @@ const Profile: React.FC = () => {
 
   const now = new Date();
   const getComplaintsByStatus = (status: "all" | "active" | "resolved") => {
-    return complaints.filter((complaint) => status === "all" || complaint.status === "active"|| complaint.status === "resolved");
+    return complaints.filter((complaint) => status === "all" || complaint.status === status);
   };
 
   const handleRepostComplaint = (id: string) => {
