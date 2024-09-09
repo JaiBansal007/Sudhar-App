@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
+import emailjs from 'emailjs-com';
 import  Upload  from '@/firebase/upload';
 import { set } from 'firebase/database';
 interface PredictionResult {
@@ -40,10 +41,19 @@ const Report: React.FC = () => {
   const URL = "./my_model/";
   const [open, setOpen] = useState(false);
   const [imageData,setimageData]=useState("");
+
+  const [email,setemail]=useState("");
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setuserID(user.uid);
+        const person=doc(db,"users",user.uid);
+        getDoc(person).then((docSnap) => {
+          if (docSnap.exists()) {
+            setemail(docSnap.data().email);
+          }
+        });
+      
       }else{
         router.push("/signin");
       }
@@ -71,32 +81,35 @@ const Report: React.FC = () => {
 };
 
 
-  const startCamera = () => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.enumerateDevices().then((devices) => {
-        const videoDevices = devices.filter((device) => device.kind === "videoinput");
-        const backCameraDevice = videoDevices.find((device) => device.label.toLowerCase().includes(""));
+const startCamera = () => {
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+      const videoDevices = devices.filter((device) => device.kind === "videoinput");
+      const backCameraDevice = videoDevices.find((device) => 
+        device.label.toLowerCase().includes("back")
+      );
 
-        if (backCameraDevice) {
-          // If a back camera is available, start it
-          navigator.mediaDevices
-            .getUserMedia({ video: { deviceId: backCameraDevice.deviceId } })
-            .then((stream) => {
-              setCameraOn(true);
-              if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-                videoRef.current.play();
-              } 
-            })
-            .catch(() => setError("Unable to access the camera."));
-        } else {
-          setError("No back camera device found."); // Show error if no back camera is available
-        }
-      });
-    } else {
-      setError("Camera access is not supported by your browser.");
-    }
-  };
+      if (backCameraDevice) {
+        // If a back camera is available, start it
+        navigator.mediaDevices
+          .getUserMedia({ video: { deviceId: backCameraDevice.deviceId } })
+          .then((stream) => {
+            setCameraOn(true);
+            if (videoRef.current) {
+              videoRef.current.srcObject = stream;
+              videoRef.current.play();
+            }
+          })
+          .catch(() => setError("Unable to access the back camera."));
+      } else {
+        setError("No back camera device found."); // Show error if no back camera is available
+      }
+    });
+  } else {
+    setError("Camera access is not supported by your browser.");
+  }
+};
+
 
   if(open){
     startCamera();
@@ -218,50 +231,74 @@ const Report: React.FC = () => {
       setLoading(false);
     }
   };
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     if (formValid) {
       await onAuthStateChanged(auth, (user) => {
         if (user) {
           setuserID(user.uid);
-        }else{
+        } else {
           router.push("/signin");
         }
       });
-      const user=doc(db,"users",userID);
-    const usersnap=await getDoc(user);
-    if(usersnap.exists()){
-      updateDoc(user,{
-        complaint:arrayUnion({
-          id:Math.random().toString(36),
-          time:new Date().toISOString(),
-          title:title,
-          description:description, 
-          location:address,
-          status:"active",
-          imageurl:imageData
-        })
-      });
-      }
-
-      const somedata=await getDoc(doc(db,"users",userID));
-      if(somedata.exists()){
-        const currentbalance=Number(Number(somedata.data().balance)+100);
-        console.log(currentbalance);
-        await updateDoc(user,{
-          balance:currentbalance,
-          orders:arrayUnion({
-            time:new Date().toISOString(),
-            voucherName:"Complaint Reward",
-            voucherPrice:+100
+      
+      const user = doc(db, "users", userID);
+      const usersnap = await getDoc(user);
+      if (usersnap.exists()) {
+        updateDoc(user, {
+          complaint: arrayUnion({
+            id: Math.random().toString(36),
+            time: new Date().toISOString(),
+            title: title,
+            description: description,
+            location: address,
+            status: "active",
+            imageurl: imageData
           })
         });
       }
-      toast.success("Complaint submitted successfully.");
-      router.push("/");
+  
+      const somedata = await getDoc(doc(db, "users", userID));
+      if (somedata.exists()) {
+        const currentbalance = Number(Number(somedata.data().balance) + 100);
+        await updateDoc(user, {
+          balance: currentbalance,
+          orders: arrayUnion({
+            time: new Date().toISOString(),
+            voucherName: "Complaint Reward",
+            voucherPrice: +100
+          })
+        });
+      }
+  
+      // EmailJS integration to send email
+      const emailParams = {
+        user_email: email, // User's email
+        complaint_title: title, // Complaint title
+        complaint_description: description, // Complaint description
+        complaint_location: address, // Complaint location
+        timestamp: new Date().toLocaleString(), // Timestamp for the complaint
+      };
+  
+      emailjs
+        .send(
+          'service_9u9o46j', // Replace with your EmailJS service ID
+          'template_ifn7svb', // Replace with your EmailJS template ID
+          emailParams,
+          'i52vi95BMEOUCfa2r' // Replace with your EmailJS user ID
+        )
+        .then(() => {
+          toast.success("Complaint submitted successfully.");
+          router.push("/");
+        })
+        .catch((error) => {
+          console.error("Error sending email:", error);
+          toast.error("Error sending confirmation email.");
+        });
     } else {
       toast.error("Please validate the images before submitting");
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
