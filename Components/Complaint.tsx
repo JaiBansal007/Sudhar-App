@@ -38,7 +38,7 @@ const Report: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [userID,setuserID]=useState("");
-  const URL = "./my_model/";
+  const URL = "my_model/";
   const [open, setOpen] = useState(false);
   const [imageData,setimageData]=useState("");
   const [email,setemail]=useState("");
