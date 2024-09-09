@@ -8,6 +8,8 @@ import app, { auth, db } from "@/firebase/config"; // Import Firebase config
 import { collection, getDocs, getFirestore } from 'firebase/firestore'; // Import Firestore
 import { useRouter } from "next/navigation"; // Import Next.js router
 import { onAuthStateChanged } from "firebase/auth"; // Import Firebase auth
+
+import { useRef } from 'react';
  
 const firestore = getFirestore(app);
  
@@ -216,21 +218,59 @@ const CommunityPosts: React.FC<{ posts: any[] }> = ({ posts }) => {
  
 // Testimonials Section Component
 const TestimonialsSection: React.FC = () => {
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    const totalWidth = slider.scrollWidth;
+    let scrollAmount = 0;
+    const speed = 10; // Adjust the scroll speed
+    const slideInterval = setInterval(() => {
+      if (slider) {
+        scrollAmount += speed;
+        slider.scrollLeft += speed;
+
+        // If the scroll reaches the end, reset it to the start seamlessly
+        if (slider.scrollLeft >= totalWidth / 2) {
+          slider.scrollLeft = 0;
+        }
+      }
+    }, 20); // Adjust the interval for the speed
+
+    return () => clearInterval(slideInterval); // Cleanup on unmount
+  }, []);
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 lg:px-0 text-center">
         <h2 className="text-4xl font-bold text-gray-800 mb-8">What Our Users Say</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { name: "Nayan Jindal", feedback: "Fantastic app! The city has never been cleaner." },
-            { name: "Jai Bansal", feedback: "Voucher in exchange of points are gamechanger." },
-            { name: "Rohan Jhanwar", feedback: "Community tab is just too good." }
-          ].map((testimonial, index) => (
-            <div key={index} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transform transition-transform duration-200 hover:scale-105">
-              <p className="text-xl text-gray-600 mb-4">"{testimonial.feedback}"</p>
-              <h3 className="text-lg font-bold text-gray-800">{testimonial.name}</h3>
-            </div>
-          ))}
+        <div
+          ref={sliderRef}
+          className="flex space-x-6 overflow-hidden py-4"  // Removed scrollbar with overflow-hidden
+          style={{ scrollBehavior: 'smooth', whiteSpace: 'nowrap' }}
+        >
+          {[...Array(2)].map((_, i) =>
+            [
+              { name: 'Nayan Jindal', feedback: 'Fantastic app! The city has never been cleaner.' },
+              { name: 'Jai Bansal', feedback: 'Voucher in exchange of points are gamechanger.' },
+              { name: 'Rohan Jhanwar', feedback: 'A game-changer for urban cleanliness—quick and easy to use!' },
+              { name: 'Dhruv Tuteja', feedback: 'I’ve been able to redeem great offers, all thanks to the point system—truly innovative.' },
+              { name: 'Pragati Verma', feedback: 'The app made reporting issues so simple, and results were immediate!' },
+              { name: 'Shubham Didharia', feedback: 'Impressed by the speed and accuracy of garbage detection!' },
+            ].map((testimonial, index) => (
+              <div
+                key={`${index}-${i}`}
+                className="bg-white p-6 min-w-[300px] md:min-w-[350px] max-w-[350px] rounded-lg shadow-md hover:shadow-lg transform transition-transform duration-200 hover:scale-105 overflow-hidden"
+              >
+                <p className="text-xl text-gray-600 mb-4 break-words whitespace-normal">
+                  "{testimonial.feedback}"
+                </p>
+                <h3 className="text-lg font-bold text-gray-800">{testimonial.name}</h3>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </section>

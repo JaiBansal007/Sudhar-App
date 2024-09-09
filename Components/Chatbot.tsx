@@ -18,6 +18,7 @@ export default function Chatbot() {
   const chatInputRef = useRef(null);
   const chatboxRef = useRef<HTMLUListElement | null>(null); // Refers to a <ul> element
   const router = useRouter();
+  
   useEffect(() => {
     const chatbox = chatboxRef.current;
     if (chatbox) {
@@ -25,8 +26,6 @@ export default function Chatbot() {
       chatbox.scrollTop = chatbox.scrollHeight ?? 0;
     }
   }, [chatMessages]);
-  
-  
 
   const handleSendMessage = () => {
     if (userMessage.trim() === '') return;
@@ -95,10 +94,10 @@ export default function Chatbot() {
     if (userSnap.exists()) {
       const { balance, orders } = userSnap.data();
       const sortedTransactions = orders
-  ? orders.sort((a: { time: string | Date }, b: { time: string | Date }) => 
-      new Date(b.time).getTime() - new Date(a.time).getTime()
-    ).slice(0, 3)
-  : [];
+        ? orders.sort((a: { time: string | Date }, b: { time: string | Date }) => 
+            new Date(b.time).getTime() - new Date(a.time).getTime()
+          ).slice(0, 3)
+        : [];
 
       return { balance, transactions: sortedTransactions };
     }
@@ -147,7 +146,9 @@ export default function Chatbot() {
       } else if (suggestion === 'View Past Complaints') {
         const complaints = await fetchComplaints(userId);
         const complaintsMessage = complaints.length
-          ? complaints.map((c:any) => `Title: ${c.title} \n Status: ${c.status} \n Description: ${c.description} `).join('\n\n')
+          ? complaints.map((c: any) => 
+              `Title: ${c.title}\nStatus: ${c.status}\nDescription: ${c.description}`
+            ).join('\n\n') // Ensure new lines between complaints
           : 'You have no registered complaints.';
         addMessage(complaintsMessage, 'incoming');
       } else {
@@ -169,22 +170,19 @@ export default function Chatbot() {
 
       {/* Chatbot toggle button */}
       <button
-  onClick={toggleChatbot}
-  className="fixed right-4 bottom-4 p-0 w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg hover:shadow-xl hover:scale-105 transition-transform ease-in-out duration-300 flex items-center justify-center overflow-hidden"
->
-  <img 
-    src="/4.png"  // Static image path that does not change
-    alt="Sudhaar Mitar"
-    className="w-20 h-20 transform translate-y-2 rounded-full object-contain" // Increased size and adjusted position
-  />
-</button>
-
-
-
+        onClick={toggleChatbot}
+        className="fixed right-4 bottom-4 p-0 w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg hover:shadow-xl hover:scale-105 transition-transform ease-in-out duration-300 flex items-center justify-center overflow-hidden"
+      >
+        <img 
+          src="/4.png" 
+          alt="Sudhaar Mitar"
+          className="w-20 h-20 transform translate-y-2 rounded-full object-contain"
+        />
+      </button>
 
       {/* Chatbot container */}
       {showChatbot && (
-        <div className="fixed right-4 bottom-20 w-72 md:w-80 lg:w-96 bg-white rounded-xl shadow-2xl overflow-hidden transition-transform transform scale-100 opacity-100">
+        <div className="fixed right-4 bottom-20 w-72 md:w-80 lg:w-96 bg-white rounded-xl shadow-2xl overflow-hidden transition-transform transform scale-100 opacity-100">
           <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex justify-between items-center rounded-t-xl shadow-sm">
             <h2 className="font-semibold">Sudhaar Mitra</h2>
           </header>
@@ -194,7 +192,7 @@ export default function Chatbot() {
             {chatMessages.map((chat, index) => (
               <li key={index} className={`flex ${chat.type === 'incoming' ? 'justify-start' : 'justify-end'}`}>
                 {chat.type === 'incoming' ? (
-                  <div className="bg-gray-200 text-gray-800 p-3 rounded-2xl shadow-md max-w-xs">
+                  <div className="bg-gray-200 text-gray-800 p-3 rounded-2xl shadow-md max-w-xs whitespace-pre-line">
                     <p>{chat.message}</p>
                     {chat.suggestions && (
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -211,7 +209,7 @@ export default function Chatbot() {
                     )}
                   </div>
                 ) : (
-                  <div className="bg-blue-600 text-white p-3 rounded-2xl shadow-md max-w-xs">
+                  <div className="bg-blue-600 text-white p-3 rounded-2xl shadow-md max-w-xs whitespace-pre-line">
                     <p>{chat.message}</p>
                   </div>
                 )}
@@ -223,7 +221,7 @@ export default function Chatbot() {
           <div className="flex items-center p-3 bg-gray-100">
             <textarea
               className="flex-1 p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ask Genearal Queries..."
+              placeholder="Ask General Queries..."
               value={userMessage}
               onChange={(e) => setUserMessage(e.target.value)}
               ref={chatInputRef}
