@@ -7,30 +7,28 @@ import { auth, db } from '@/firebase/config';
 import { collection, doc, getDoc, getDocs, where } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { query } from 'express';
-import { create } from 'domain';
 
 const googleAuthProvider = new GoogleAuthProvider();
 
-export default function SignUp() {
+export default function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userRef = doc(db, "mcd", user.uid);
         const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
+        if (userDoc) {
           router.push("/mcd/profile");
         }
       }
+      console.log(user);
     });
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, [router]);
+
+  }, []);
 
   const handler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

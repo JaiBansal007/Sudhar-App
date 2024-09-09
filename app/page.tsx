@@ -93,7 +93,8 @@ const Home: React.FC = () => {
  
 const HeroSection: React.FC = () => {
   const images = [
-    '/1.png',   // Add your image paths here
+    'https://static.vecteezy.com/system/resources/previews/035/879/360/original/garbage-dump-with-rubbish-bin-for-recycling-in-park-different-types-of-waste-trash-laying-on-the-street-illustration-in-flat-style-vector.jpg',
+    'https://static.vecteezy.com/system/resources/previews/007/637/240/original/people-cleaning-garbage-on-beach-area-free-vector.jpg',
     'https://png.pngtree.com/png-clipart/20230824/original/pngtree-waste-management-concept-activist-people-picture-image_8422764.png',
     'https://previews.123rf.com/images/surfupvector/surfupvector2009/surfupvector200900152/154889265-trash-pickup-worker-cleaning-dustbin-at-truck-man-carrying-trash-in-plastic-bag-flat-vector.jpg',
   ];
@@ -145,20 +146,6 @@ const HeroSection: React.FC = () => {
           Report a Complaint
         </button>
       </div>
- 
-      {/* Navigation arrows */}
-      <button
-        className="absolute left-4 text-white text-4xl bg-gray-700 rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
-        onClick={prevImage}
-      >
-        &#10094;
-      </button>
-      <button
-        className="absolute right-4 text-white text-4xl bg-gray-700 rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
-        onClick={nextImage}
-      >
-        &#10095;
-      </button>
  
       {/* Dots to show the current image */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">

@@ -2,10 +2,10 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {useRouter} from 'next/navigation'
-import { GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, db } from '@/firebase/config';
 import {toast} from 'react-toastify';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 const googleauth=new GoogleAuthProvider();
 export default function Signin(){
   const [email, setEmail] = useState<string>("");
@@ -13,13 +13,37 @@ export default function Signin(){
   const router = useRouter();
   const signinusingemail=async(e:any)=>{
     e.preventDefault();
-    try {
-      const res=await signInWithEmailAndPassword(auth,email, password);
-      toast.success("Successfully Logged in");
-      router.push("/profile");
-    } catch (error) {
-      toast.error("Invalid Credentials");
-      console.log(error);
+    try{
+      await signInWithEmailAndPassword(auth,email,password);
+      router.push('/profile');
+    }catch(error){
+      try {
+        // Fetch all the documents from the "mcd" collection
+        const mcdCollectionRef = collection(db, 'users');
+        const querySnapshot = await getDocs(mcdCollectionRef);
+        let userFound = false;
+        // Loop through all documents and check if the email matches
+        querySnapshot.forEach((doc) => {
+          const userData = doc.data();
+          if (userData.email === email) {
+            userFound = true;
+            if (userData.password === password) {
+              createUserWithEmailAndPassword(auth, email, password).then(()=>{
+                toast.success('Login Successful');
+                router.push('/profile');
+              })
+            } else {
+              toast.error('Invalid Credentials');
+            }
+          }
+        });
+        if (!userFound) {
+          toast.error('User not found');
+        }
+      } catch (error) {
+        toast.error('Error fetching user data');
+        console.error(error);
+      }
     }
   }
   useEffect(()=>{
