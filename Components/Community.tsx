@@ -104,7 +104,7 @@ export default function Community() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl w-full">
         {filteredPosts.map((post) => (
           <div
-            key={post.id}
+            key={post.title}
             className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
             onClick={() => openPostModal(post)}
           >
