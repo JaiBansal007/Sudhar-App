@@ -223,7 +223,7 @@ export default function Chatbot() {
           <div className="flex items-center p-3 bg-gray-100">
             <textarea
               className="flex-1 p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter a message..."
+              placeholder="Ask Genearal Queries..."
               value={userMessage}
               onChange={(e) => setUserMessage(e.target.value)}
               ref={chatInputRef}
