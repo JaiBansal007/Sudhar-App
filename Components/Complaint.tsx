@@ -85,12 +85,13 @@ const startCamera = () => {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       const videoDevices = devices.filter((device) => device.kind === "videoinput");
+ 
+      // Fallback to the first available camera if no back camera is found
       const backCameraDevice = videoDevices.find((device) => 
         device.label.toLowerCase().includes("back")
-      );
-
+      ) || videoDevices[0]; // Fallback to the first available camera
+ 
       if (backCameraDevice) {
-        // If a back camera is available, start it
         navigator.mediaDevices
           .getUserMedia({ video: { deviceId: backCameraDevice.deviceId } })
           .then((stream) => {
@@ -100,9 +101,9 @@ const startCamera = () => {
               videoRef.current.play();
             }
           })
-          .catch(() => setError("Unable to access the back camera."));
+          .catch(() => setError("Unable to access the camera."));
       } else {
-        setError("No back camera device found."); // Show error if no back camera is available
+        setError("No camera device found.");
       }
     });
   } else {
