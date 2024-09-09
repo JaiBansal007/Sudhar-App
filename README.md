@@ -21,7 +21,3 @@ Follow these steps to run the project locally
     npm run dev
 
    --if not working, try above two npm commands with 'sudo'
-
-
-
-
