@@ -13,9 +13,12 @@ export default function Navbar() {
       <nav className="bg-white border-gray-200 dark:bg-gray-900">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <Link href="/">
-            <button className="flex items-center space-x-3 rtl:space-x-reverse">
-              <img src="/1.png" className="h-14" alt="Logo" />
-              <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Sudhaar</span>
+            <button className="flex items-center space-x-1 rtl:space-x-reverse">
+              <img src="/1.png" className="h-12" alt="Logo" />
+              <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+              <img src="/5.png" alt="Sudhaar Logo" className="h-8 inline-block" />
+              </span>
+
             </button>
           </Link>
           <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
