@@ -14,7 +14,7 @@ const TransactionPage = () => {
   const voucherPrice = parseInt(searchParams.get('voucherPrice') || '0');
   const [initialBalance, setInitialBalance] = useState(0);
   const [userId, setUserId] = useState("");
-  const [userEmail, setUserEmail] = useState("");  // To store the user's email
+  const [userEmail, setUserEmail] = useState<string|null>("");  // To store the user's email
   const [balance, setBalance] = useState(initialBalance);
   const [finalBalance, setFinalBalance] = useState(initialBalance);
   const router = useRouter();
@@ -85,10 +85,10 @@ const TransactionPage = () => {
     };
 
     emailjs.send(
-      'service_r8lthks',  // Replace with your EmailJS service ID
-      'template_rjukh77',  // Replace with your EmailJS template ID
+      'service_9u9o46j',  // Replace with your EmailJS service ID
+      'template_yihk7r6',  // Replace with your EmailJS template ID
       emailParams,
-      'QrK1DlzU_Ho0BMgKD'  // Replace with your EmailJS public key
+      'i52vi95BMEOUCfa2r'  // Replace with your EmailJS public key
     )
     .then((response) => {
       console.log('Email sent successfully:', response.status, response.text);
