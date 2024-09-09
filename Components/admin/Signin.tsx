@@ -29,7 +29,6 @@ export default function Signin() {
       }
     });
     // Cleanup subscription on unmount
-    
   }, []);
 
   const handler = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, db } from '@/firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, where } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { query } from 'express';
+import { create } from 'domain';
 
 const googleAuthProvider = new GoogleAuthProvider();
 
@@ -32,29 +34,38 @@ export default function SignUp() {
 
   const handler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(email,password);
-    try {
-      const res = await signInWithEmailAndPassword(auth, email, password);
-      
-      router.push("/mcd/profile");
-      console.log(res);
-      // const userId = res.user.uid;
-      // console.log(userId);
-
-      // const userDocRef = doc(db, "mcd", userId);
-      // const userSnap = await getDoc(userDocRef);
-
-      // if (userSnap.exists()) {
-      //   router.push("/mcd/profile");
-      //   toast.success("Successfully Logged in");
-      // } else {
-      //   await auth.signOut();
-      //   router.push("/mcd/signin");
-      //   toast.error("Access Denied");
-      // }
-    } catch (error) {
-      toast.error("Login Failed");
-      console.log(error);
+    try{
+      await signInWithEmailAndPassword(auth,email,password);
+      router.push('/mcd/profile');
+    }catch(error){
+      try {
+        // Fetch all the documents from the "mcd" collection
+        const mcdCollectionRef = collection(db, 'mcd');
+        const querySnapshot = await getDocs(mcdCollectionRef);
+        let userFound = false;
+        // Loop through all documents and check if the email matches
+        querySnapshot.forEach((doc) => {
+          const userData = doc.data();
+          if (userData.email === email) {
+            userFound = true;
+            if (userData.password === password) {
+              createUserWithEmailAndPassword(auth, email, password).then(()=>{
+                toast.success('Login Successful');
+                router.push('/mcd/profile');
+              })
+            } else {
+              toast.error('Invalid Credentials');
+            }
+          }
+        });
+    
+        if (!userFound) {
+          toast.error('User not found');
+        }
+      } catch (error) {
+        toast.error('Error fetching user data');
+        console.error(error);
+      }
     }
   };
 

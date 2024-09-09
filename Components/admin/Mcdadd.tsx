@@ -6,8 +6,7 @@ import { auth, db } from '@/firebase/config';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { get } from 'http';
-
+import admin from 'firebase-admin';
 const googleauthprovider = new GoogleAuthProvider();
 
 export default function Mcdadd() {
@@ -15,7 +14,6 @@ export default function Mcdadd() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [match, setMatch] = useState(true);
-  const [admin,setadmin]=useState({});
   const router = useRouter();
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
@@ -55,19 +53,15 @@ export default function Mcdadd() {
             toast.error("Access Denied");
             return;
             }
-        const admindata=await getDoc(doc(db, "admin", auth.currentUser.uid));
-        if(admindata.exists()){
-            setadmin({
-                adminid:admindata.data().id,
-                adminemail:admindata.data().email,
-                adminpassword:admindata.data().password
-            });
-        }
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+        // const userRecord = await admin.auth().createUser({
+        //     email: email,
+        //     password: password,
+        //   });
+        //   console.log('Successfully created new user:',= userRecord.uid);
   
+
         // // Save additional user data in Firestore
-        const userId = user.uid; // Get the UID from the created user
+        const userId = randomid(20); // Get the UID from the created user
         await setDoc(doc(db, "mcd", userId), {
           email: email,
           password: password, // Note: It's best practice to avoid storing passwords in plain text
