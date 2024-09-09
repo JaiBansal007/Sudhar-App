@@ -7,6 +7,12 @@ Follow these steps to run the project locally
 
    cd Sudhar-App
 
+   touch .env.local
+
+   then copy variables from .env.example
+   
+   then setup firebase keys
+
 2. **Run these commands**
     ```bash
 
@@ -15,3 +21,17 @@ Follow these steps to run the project locally
     npm run dev
 
    --if not working, try above two npm commands with 'sudo'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
