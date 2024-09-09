@@ -8,8 +8,6 @@ import { arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import emailjs from 'emailjs-com';
-import  Upload  from '@/firebase/upload';
-import { set } from 'firebase/database';
 interface PredictionResult {
   text: string;
   color: string;
@@ -38,7 +36,7 @@ const Report: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [userID,setuserID]=useState("");
-  const URL = "my_model/";
+  const URL = "./my_model/";
   const [open, setOpen] = useState(false);
   const [imageData,setimageData]=useState("");
   const [email,setemail]=useState("");
