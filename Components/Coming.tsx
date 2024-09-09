@@ -3,29 +3,29 @@ import React from 'react';
 const ComingSoon: React.FC = () => {
   const technologies = [
     {
-      name: 'Sponsored Cleanup Campaigns',
+      name: 'NGO Collaboration',
       description:
-        'Partner with brands or large corporations who want to associate themselves with social and environmental causes.',
-      icon: 'https://cdn-icons-png.flaticon.com/512/3867/3867424.png',
+        'NGOs can partner with SUDHAAR to organize sustainability events clean-up drives, recycling programs, and workshops where users can actively participate and earn rewards for their involvement.',
+      icon: 'https://cdn-icons-png.flaticon.com/512/5153/5153006.png',
     },
     {
       name: 'Aadhaar Authentication for Login',
       description:
         'Integrating Aadhaar authentication as a login option on our platform to provide users with a secure and seamless login experience.',
-      icon: 'https://cdn-icons-png.flaticon.com/512/3050/3050496.png', // Icon representing secure login or authentication
+      icon: 'https://cdn-icons-png.flaticon.com/512/10828/10828847.png', 
     },
     
     {
       name: 'Eco-Friendly Product Partnerships',
       description:
         'Partner with companies that sell eco-friendly products (such as reusable bags, composting kits, or electric scooters).',
-      icon: 'https://static.vecteezy.com/system/resources/thumbnails/011/468/911/small_2x/eco-friendly-icon-ecologic-food-stamp-organic-natural-healthy-food-product-label-free-vector.jpg',
+      icon: 'https://cdn-icons-png.flaticon.com/512/4909/4909025.png',
     },
     {
-      name: 'Consulting and Urban Planning Services',
+      name: 'AI-Powered Insights',
       description:
-        'You can offer tailored recommendations on how to improve urban spaces and reduce public infrastructure problems.',
-      icon: 'https://cdn-icons-png.freepik.com/512/8151/8151255.png',
+        'Tailored eco-tips on waste reduction, energy efficiency, and recycling, empowering users to make sustainable choices effortlessly.',
+      icon: 'https://cdn-icons-png.flaticon.com/512/12394/12394750.png',
     },
   ];
  
