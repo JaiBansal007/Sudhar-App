@@ -99,22 +99,6 @@ const Profile: React.FC = () => {
     }
   };
 
-  const delet=async()=>{
-    const is=confirm("Are you sure you want to delete your account?");
-     if(is){
-      try {
-        const user = getAuth().currentUser;
-        if (user) {
-          await deleteUser(user);
-          toast.success("Account deleted successfully");
-          router.push("/signin");
-        }
-      } catch (error) {
-        console.error("Failed to delete account", error);
-        toast.error("Failed to delete account. Try again.");
-      }
-   }
-    }
   const handleResolvedClick = async (id: string) => {
     try {
       const updatedComplaints:any = complaints.map((complaint) => {
@@ -172,15 +156,6 @@ const Profile: React.FC = () => {
                 className="w-full bg-slate-500 text-white mt-4 py-2 rounded-lg font-semibold hover:bg-slate-800 focus:ring-2 focus:ring-blue-500"
               >
                 Logout
-              </button>
-            </Link>
-            <Link href="/signin">
-              <button
-                onClick={delet}
-                type="button"
-                className="w-full bg-slate-500 text-white mt-4 py-2 rounded-lg font-semibold hover:bg-slate-800 focus:ring-2 focus:ring-blue-500"
-              >
-                Delete Account
               </button>
             </Link>
             <button
