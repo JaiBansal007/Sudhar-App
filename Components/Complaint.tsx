@@ -40,10 +40,18 @@ const Report: React.FC = () => {
   const URL = "./my_model/";
   const [open, setOpen] = useState(false);
   const [imageData,setimageData]=useState("");
+  const [email,setemail]=useState("");
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setuserID(user.uid);
+        const person=doc(db,"users",user.uid);
+        getDoc(person).then((docSnap) => {
+          if (docSnap.exists()) {
+            setemail(docSnap.data().email);
+          }
+        });
+      
       }else{
         router.push("/signin");
       }
@@ -218,6 +226,7 @@ const Report: React.FC = () => {
       setLoading(false);
     }
   };
+
   const handleSubmit = async() => {
     if (formValid) {
       await onAuthStateChanged(auth, (user) => {
@@ -229,6 +238,7 @@ const Report: React.FC = () => {
       });
       const user=doc(db,"users",userID);
     const usersnap=await getDoc(user);
+
     if(usersnap.exists()){
       updateDoc(user,{
         complaint:arrayUnion({

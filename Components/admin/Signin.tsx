@@ -10,34 +10,35 @@ import { toast } from 'react-toastify';
 
 const googleAuthProvider = new GoogleAuthProvider();
 
-export default function SignUp() {
+export default function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const userRef = doc(db, "mcd", user.uid);
+        const userRef = doc(db, "admin", user.uid);
         const userDoc = await getDoc(userRef);
         if (userDoc.exists()) {
-          router.push("/mcd/profile");
+          router.push("/admin/profile");
         }
+        console.log("User logged in");
+      }else{
+        console.log("User not logged in");
       }
     });
-
     // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, [router]);
+    
+  }, []);
 
   const handler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(email,password);
     try {
       const res = await signInWithEmailAndPassword(auth, email, password);
-      
-      router.push("/mcd/profile");
-      console.log(res);
+      router.push("/admin/profile");
+      toast.success("Admin Logged in");
       // const userId = res.user.uid;
       // console.log(userId);
 
@@ -60,7 +61,7 @@ export default function SignUp() {
 
   const googleRegister = async () => {
     toast.error("Access Denied");
-    router.push('/mcd/signin');
+    router.push('/admin/signin');
     // try {
     //   const res = await signInWithPopup(auth, googleAuthProvider);
     //   const userId = res.user.uid;
@@ -84,11 +85,11 @@ export default function SignUp() {
   return (
     <div>
       <section className="bg-gray-50 dark:bg-gray-900">
-        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-[80vh] lg:py-0">
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                MCD Login
+                Admin Login
               </h1>
               <form className="space-y-4 md:space-y-6" onSubmit={handler}>
                 <div>
@@ -154,7 +155,7 @@ export default function SignUp() {
                     </button>
                   </Link>
                 </div>
-                <div className="space-x-6 flex justify-center mt-6">
+                {/* <div className="space-x-6 flex justify-center mt-6">
                   <button onClick={googleRegister} type="button" className="border-none outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32px" className="inline" viewBox="0 0 512 512">
                       <path fill="#fbbd00" d="M120 256c0-25.367 6.989-49.13 19.131-69.477v-86.308H52.823C18.568 144.703 0 198.922 0 256s18.568 111.297 52.823 155.785h86.308v-86.308C126.989 305.13 120 281.367 120 256z" data-original="#fbbd00" />
@@ -172,13 +173,7 @@ export default function SignUp() {
                       <path fill="#fff" d="M353.126 330.6 364.493 256H293.36v-49.64c0-20.288 9.961-40.059 41.795-40.059h32.309V103.27s-29.333-5-57.353-5c-58.366 0-96.512 35.262-96.512 99.19V256h-64.599v74.6h64.599v178.32a259.895 259.895 0 0 0 80 0V330.6z" data-original="#ffffff" />
                     </svg>
                   </button>
-                </div>
-                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                  Don’t have an account yet? 
-                  <Link href="/mcd/signup">
-                    <button className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</button>
-                  </Link>
-                </p>
+                </div> */}
               </form>
             </div>
           </div>

@@ -22,42 +22,45 @@ const ReceivedComplaints: React.FC = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const router = useRouter();
 
-  const fetchPosts = async () => {
-    try {
-      const postsRef = collection(firestore, "users");
-      const data = await getDocs(postsRef);
+const fetchPosts = async () => {
+  try {
+    const postsRef = collection(firestore, "users");
+    const data = await getDocs(postsRef);
 
-      const userRecord = data.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    const userRecord = data.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-      const formatUserPosts = (rawPosts: any[]): any[] => {
-        const combinedPosts = rawPosts.flatMap((user) => {
-          if (user.complaint && user.complaint.length > 0) {
-            return user.complaint.map((post: any) => ({
-              id: post.id,
-              title: post.title,
-              description: post.description,
-              location: post.location,
-              status: post.status,
-              createdAt: post.time,
-              userID: user.id,
-              user: user.email,
-              imageurl: post.imageurl,
-            }));
-          }
-          return [];
-        });
-        return combinedPosts;
-      };
+    const formatUserPosts = (rawPosts: any[]): any[] => {
+      const combinedPosts = rawPosts.flatMap((user) => {
+        if (user.complaint && user.complaint.length > 0) {
+          return user.complaint.map((post: any) => ({
+            id: post.id,
+            title: post.title,
+            description: post.description,
+            location: post.location,
+            status: post.status,
+            createdAt: post.time,
+            userID: user.id,
+            user: user.email,
+            imageurl: post.imageurl,
+          }));
+        }
+        return [];
+      });
 
-      const combinedPostsArray = formatUserPosts(userRecord);
-      setComplaints(combinedPostsArray);
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-    }
-  };
+      // Sort posts by createdAt field, most recent first
+      return combinedPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    };
+
+    const combinedPostsArray = formatUserPosts(userRecord);
+    setComplaints(combinedPostsArray);
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+  }
+};
+
 
   const sendEmail = (userEmail: string, complaintTitle: string, complaintDescription: string) => {
     const templateParams = {
@@ -88,7 +91,7 @@ const ReceivedComplaints: React.FC = () => {
 
         const updatedComplaints = complaints.map((complaint: any) => {
           if (complaint.id === props.complaintid) {
-            sendEmail(userData.email, complaint.title); // Send email when complaint is marked as resolved
+            sendEmail(userData.email, complaint.title,complaint.description); // Send email when complaint is marked as resolved
             return {
               ...complaint,
               status: complaint.status === "resolved" ? "active" : "resolved", // Toggle between active and resolved
