@@ -258,7 +258,7 @@ const TestimonialsSection: React.FC = () => {
               { name: 'Rohan Jhanwar', feedback: 'A game-changer for urban cleanliness—quick and easy to use!' },
               { name: 'Dhruv Tuteja', feedback: 'I’ve been able to redeem great offers, all thanks to the point system—truly innovative.' },
               { name: 'Pragati Verma', feedback: 'The app made reporting issues so simple, and results were immediate!' },
-              { name: 'Shubham Kumar Didharia', feedback: 'Impressed by the speed and accuracy of garbage detection!' },
+              { name: 'Shubham Didharia', feedback: 'Impressed by the speed and accuracy of garbage detection!' },
             ].map((testimonial, index) => (
               <div
                 key={`${index}-${i}`}
