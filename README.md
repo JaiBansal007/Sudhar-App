@@ -1,6 +1,7 @@
 ## Team Details
  
 **Team Name:** 64 bits
+
 **PS Id:** 1592
  
 **Team Leader:** [@JaiBansal007](https://github.com/JaiBansal007)
