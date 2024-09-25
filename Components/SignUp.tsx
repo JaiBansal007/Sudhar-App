@@ -14,12 +14,13 @@ export default function SignUp(){
   const [match, setMatch] = useState(true);
   const router = useRouter();
   useEffect(() => {
+    
     if(password!==confirmPassword){
       setMatch(false);
     }else{
       setMatch(true);
     }
-    
+
   }, [confirmPassword]);
   useEffect(()=>{
     onAuthStateChanged(auth,(user)=>{

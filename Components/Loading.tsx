@@ -1,4 +1,4 @@
-export default function Transaction(){
+export default function Loading(){
     return (
       <div>
       <div className='flex space-x-2 justify-center items-center bg-white h-screen dark:invert relative'>

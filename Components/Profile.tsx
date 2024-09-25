@@ -73,10 +73,34 @@ const Profile: React.FC = () => {
     );
   };
 
-  const handleRepostComplaint = (id: string) => {
-    // Logic to repost complaint
-    // window.location.href = /repost-complaint/${id};
+  const handleRepostComplaint = async (id: string) => {
+    try {
+      // Update the complaints array with the new 'createdAt' time for the reposted complaint
+      const updatedComplaints: any = complaints.map((complaint) => {
+        if (complaint.id === id) {
+          return {
+            ...complaint,
+            time: new Date().toISOString(), // Set to current time in ISO format
+          };
+        }
+        return complaint;
+      });
+      // Update the state with the modified complaints
+      setComplaints(updatedComplaints);
+  
+      // Update the Firestore document with the modified complaints
+      const userRef = doc(db, "users", userID);
+      await updateDoc(userRef, {
+        complaint: updatedComplaints,
+      });
+  
+      toast.success("Complaint reposted successfully!");
+    } catch (error) {
+      console.error("Failed to repost complaint", error);
+      toast.error("Failed to repost complaint.");
+    }
   };
+  
 
   const handleUserApproval = async (id: string, approved: boolean) => {
     try {
@@ -196,12 +220,11 @@ const Profile: React.FC = () => {
                   ) : (
                     <>
                       {getComplaintsByStatus(activeTab).map((complaint:any) => {
-                        const complaintDate = new Date(complaint.createdAt);
+                        const complaintDate = new Date(complaint.time);
                         const diffDays = Math.floor(
                           (now.getTime() - complaintDate.getTime()) /
                             (1000 * 60 * 60 * 24)
                         );
-
                         return (
                           <div key={complaint.id} className="border-t border-gray-200">
                             <div className="p-4">
@@ -228,7 +251,7 @@ const Profile: React.FC = () => {
                               />
 
                               {/* Repost Button for Active Complaints */}
-                              {activeTab === "active" && diffDays > 3 && (
+                              {activeTab === "active" && diffDays > 2 && (
                                 <button
                                   onClick={() => handleRepostComplaint(complaint.id)}
                                   className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500"
