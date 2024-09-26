@@ -44,6 +44,7 @@ const Buy: React.FC = () => {
               createdAt: post.createdAt,
               state: post.state,
               district: post.district,
+              useraddress: post.address,
             }));
           }
           return [];
@@ -66,7 +67,7 @@ const Buy: React.FC = () => {
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.push("/login");
+        router.push("/ngo/login");
       }
     });
       setloading(true);
@@ -80,7 +81,7 @@ const Buy: React.FC = () => {
         toast.error("Please enter a valid amount!");
         return;
       }
-      if(number>100000){
+      if(number>10000){
         toast.error("Please enter a valid amount!");
         return;
       }
@@ -103,6 +104,7 @@ const Buy: React.FC = () => {
         });
 
         await updateDoc(userRef, { trading: updatedComplaints });
+        fetchPosts();
         toast.success("Offer submitted successfully!");
       } else {
         console.log("User not found.");
@@ -162,21 +164,57 @@ const Buy: React.FC = () => {
               </div>
 
               {/* Offer Submission Section */}
-              <div className="mt-6">
-                <input
-                  type="number"
-                  className="w-full p-3 bg-gray-50 rounded-lg"
-                  placeholder="Enter offer amount"
-                  onChange={(e) => {
-                    setNumber(Number(e.target.value));
-                  }}
-                />
+              <div className="offer-section p-4 rounded-lg bg-white shadow-md">
+                {order.status === "accepted" ? (
+                  <>
+                  <p className="text-green-600 font-semibold text-lg flex justify-between items-center">✅ Offer Accepted               
+                <span>Amount : {order.price}</span></p>
                 <button
-                  onClick={() => handleSubmitOffer({userid: order.userid, tradingid: order.orderid})}
-                  className="mt-4 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg hover:bg-green-600"
-                >
-                  Submit Offer
-                </button>
+                      onClick={() =>{
+                      router.push("/ngo/wallet");
+                          }}
+                type="button"
+                className=" min-w-24 w-1/6 bg-slate-500 text-white mt-4 md:py-2 rounded-lg font-semibold hover:bg-slate-800 focus:ring-2 focus:ring-blue-500"
+                    >
+                    Make Payment
+                    </button>
+                  </>
+                ) : order.status === "offer_made" ? (
+                  <p className="text-yellow-500 font-semibold text-lg flex justify-between items-center">⏳ Waiting for User Response <span>Offer Submitted : {order.price}</span></p>
+                ) : order.status === "rejected" ? (
+                  <>
+                  <p className="text-red-500 font-semibold text-lg">❌ Offer Rejected</p>
+                  <div className="mt-4">
+                    <input
+                      type="number"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300"
+                      placeholder="Enter offer amount"
+                      onChange={(e) => setNumber(Number(e.target.value))}
+                    />
+                    <button
+                      onClick={() => handleSubmitOffer({ userid: order.userid, tradingid: order.orderid })}
+                      className="mt-4 bg-green-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-green-600 transition-colors"
+                    >
+                      Submit Offer
+                    </button>
+                  </div>
+                  </>
+                ) : order.status === "pending" && (
+                  <div className="mt-4">
+                    <input
+                      type="number"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300"
+                      placeholder="Enter offer amount"
+                      onChange={(e) => setNumber(Number(e.target.value))}
+                    />
+                    <button
+                      onClick={() => handleSubmitOffer({ userid: order.userid, tradingid: order.orderid })}
+                      className="mt-4 bg-green-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-green-600 transition-colors"
+                    >
+                      Submit Offer
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))

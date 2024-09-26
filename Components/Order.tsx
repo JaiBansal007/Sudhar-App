@@ -6,15 +6,18 @@ import { toast, Toaster } from "react-hot-toast"; // For toaster message
 import {useRouter} from 'next/navigation';
 import { onAuthStateChanged } from "firebase/auth";
 import { set } from "firebase/database";
+import Loading from "./Loading";
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
+  const [userid, setUserid] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
   // Fetch user's orders from Firestore
   useEffect(() => {
     const fetchDetails = async () => {
       onAuthStateChanged(auth, async (user) => {
         if (user) {
-          console.log(user.uid);
+          setUserid(user.uid);
           try {
             const userdata=doc(db,"users",user.uid);
             const usersnap=await getDoc(userdata);
@@ -24,6 +27,7 @@ const Orders: React.FC = () => {
                 setOrders(data["trading"]);
               }
             }
+            setLoading(false);
           } catch (error) {
             console.error("Error fetching orders: ", error);
             toast.error("Error fetching orders");
@@ -33,7 +37,6 @@ const Orders: React.FC = () => {
         }
       });
     };
-
     fetchDetails();
   }, []);
 
@@ -47,10 +50,11 @@ const Orders: React.FC = () => {
         return order;
       });
       setOrders(updatedtrading);
-      const orderRef = doc(db, "users", orderId);
+      const orderRef = doc(db, "users", userid);
       await updateDoc(orderRef, {
         trading: updatedtrading,
       });
+      console.log("Order updated successfully!");
       toast.success(`Offer ${status === "accepted" ? "accepted" : "rejected"} successfully!`);
     } catch (error) {
       console.error("Error updating order: ", error);
@@ -58,6 +62,9 @@ const Orders: React.FC = () => {
     }
   };
 
+  if(loading){
+    return <Loading/>;
+  }
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <Toaster /> {/* Toaster component for displaying notifications */}

@@ -4,6 +4,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import Loading from '../Loading';
+import { set } from 'firebase/database';
 
 interface Transaction {
   time: string;
@@ -19,14 +21,11 @@ const Wallet: React.FC = () => {
   const router = useRouter();
   const [coin, setCoin] = useState<number>(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-
-  useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setUserId(user.uid);
-        const userRef = doc(db, "dealers", user.uid);
+  const [loading, setLoading] = useState<boolean>(false);
+  const fetch = async (props:any) => {
+        const userRef = doc(db, "dealers",props );
         const userSnap = await getDoc(userRef);
-
+        
         if (userSnap.exists()) {
           const fetchedBalance = userSnap.data().balance;
           const fetchedTransactions = userSnap.data().orders || [];
@@ -35,21 +34,29 @@ const Wallet: React.FC = () => {
           // Sort transactions by time (most recent first) and slice to get the last 3 transactions
           const sortedTransactions = fetchedTransactions.sort((a: { time: string | Date }, b: { time: string | Date }) => new Date(b.time).getTime() - new Date(a.time).getTime());
           setTransactions(sortedTransactions);
+          console.log(sortedTransactions);
         }
+        setLoading(false);
+  }
+
+  useEffect(() => {
+    setLoading(true);
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        fetch(user.uid);
+        setUserId(user.uid);
       } else {
         router.push("/ngo/signin");
       }
     });
-  }, [router]);
+
+  }, []);
 
   const handleCoinClick = (coin: number) => {
     setSelectedCoin(coin);
     setShowPopup(true);
   };
 
-  const handleClosePopup = () => {
-    setShowPopup(false);
-  };
 
   const handleAddMoney = async (amount: number) => {
     try {
@@ -72,14 +79,15 @@ const Wallet: React.FC = () => {
         balance: updatedCoin,
         orders: updatedTransactions
       });
-
       // Close the Add Money popup
       setShowAddMoneyPopup(false);
     } catch (error) {
       console.error("Error adding money:", error);
     }
   };
-
+  if(loading){
+    return <Loading/>;
+  }
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-4xl p-8 space-y-6 bg-white rounded-lg shadow-lg">
@@ -145,7 +153,9 @@ const Wallet: React.FC = () => {
               <p className="text-gray-700 mb-4">Details and statistics about {selectedCoin} would go here.</p>
               <button
                 type="button"
-                onClick={handleClosePopup}
+                onClick={()=>{
+                  setShowPopup(false);
+                }}
                 className="w-full bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-600"
               >
                 Close
