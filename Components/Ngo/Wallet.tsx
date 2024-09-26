@@ -1,21 +1,24 @@
-"use client"
+"use client";
 import { auth, db } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 interface Transaction {
   time: string;
+  voucherName: string;
+  voucherPrice: number;
 }
 
 const Wallet: React.FC = () => {
   const [showPopup, setShowPopup] = useState<boolean>(false);
-  const [userId, setUserId] = useState("");
+  const [showAddMoneyPopup, setShowAddMoneyPopup] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string>("");
   const [selectedCoin, setSelectedCoin] = useState<number | null>(null);
   const router = useRouter();
-  const [coin, setCoin] = useState(0);
-  const [transactions, setTransactions] = useState([]);
+  const [coin, setCoin] = useState<number>(0);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
@@ -48,6 +51,35 @@ const Wallet: React.FC = () => {
     setShowPopup(false);
   };
 
+  const handleAddMoney = async (amount: number) => {
+    try {
+      // Update the coin balance in state
+      const updatedCoin = coin + amount;
+      setCoin(updatedCoin);
+
+      // Add new transaction to the state
+      const newTransaction: Transaction = {
+        time: new Date().toISOString(),
+        voucherName: 'Add Money',
+        voucherPrice: amount
+      };
+      const updatedTransactions = [newTransaction, ...transactions];
+      setTransactions(updatedTransactions);
+
+      // Update Firestore with the new balance and transaction
+      const userRef = doc(db, "dealers", userId);
+      await updateDoc(userRef, {
+        balance: updatedCoin,
+        orders: updatedTransactions
+      });
+
+      // Close the Add Money popup
+      setShowAddMoneyPopup(false);
+    } catch (error) {
+      console.error("Error adding money:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-4xl p-8 space-y-6 bg-white rounded-lg shadow-lg">
@@ -70,7 +102,7 @@ const Wallet: React.FC = () => {
             <div className="ml-4">
               <button
                 className="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-all duration-200"
-                onClick={() => console.log('Add Money Clicked')}
+                onClick={() => setShowAddMoneyPopup(true)} // Show Add Money Popup
               >
                 Add Money
               </button>
@@ -92,7 +124,7 @@ const Wallet: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {transactions.map((transaction: any, index) => (
+                  {transactions.map((transaction, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.time.substring(0, 10)}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.voucherName}</td>
@@ -105,7 +137,7 @@ const Wallet: React.FC = () => {
           </div>
         </div>
 
-        {/* Popup */}
+        {/* Coin Details Popup */}
         {showPopup && selectedCoin && (
           <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-80 max-w-full">
@@ -117,6 +149,33 @@ const Wallet: React.FC = () => {
                 className="w-full bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-600"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Add Money Popup */}
+        {showAddMoneyPopup && (
+          <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-80 max-w-full">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Add Money</h4>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {[100, 200, 500, 1000].map((amount) => (
+                  <button
+                    key={amount}
+                    className="bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-600"
+                    onClick={() => handleAddMoney(amount)}
+                  >
+                    ₹{amount}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddMoneyPopup(false)}
+                className="w-full bg-red-500 text-white py-2 rounded-lg font-semibold hover:bg-red-600"
+              >
+                Cancel
               </button>
             </div>
           </div>
