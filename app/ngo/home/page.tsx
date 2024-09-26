@@ -1,16 +1,16 @@
 "use client";
  
 import React, { useEffect, useState } from 'react';
-import Navbar from '@/Components/Navbar'; // Import Navbar
-import Footer from '@/Components/Footer'; // Import Footer
-import Chatbot from '@/Components/Chatbot'; // Import Chatbot
+import Navbar from '@/Components/Ngo/Navbar'; // Import Navbar
+import Footer from '@/Components/Ngo/Footer'; // Import Footer
+
 import app, { auth, db } from "@/firebase/config"; // Import Firebase config
 import { collection, getDocs, getFirestore } from 'firebase/firestore'; // Import Firestore
 import { useRouter } from "next/navigation"; // Import Next.js router
 import { onAuthStateChanged } from "firebase/auth"; // Import Firebase auth
 
 import { useRef } from 'react';
- 
+
 const firestore = getFirestore(app);
  
 const Home: React.FC = () => {
@@ -82,8 +82,7 @@ const Home: React.FC = () => {
       {/* FAQ Section */}
       <FAQSection />
  
-      {/* Chatbot */}
-      <Chatbot />
+      
  
       {/* Footer */}
       <Footer />
@@ -98,7 +97,6 @@ const HeroSection: React.FC = () => {
     'https://png.pngtree.com/png-clipart/20230824/original/pngtree-waste-management-concept-activist-people-picture-image_8422764.png',
     'https://previews.123rf.com/images/surfupvector/surfupvector2009/surfupvector200900152/154889265-trash-pickup-worker-cleaning-dustbin-at-truck-man-carrying-trash-in-plastic-bag-flat-vector.jpg',
   ];
- 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
  
   // Function to handle next image
@@ -141,11 +139,14 @@ const HeroSection: React.FC = () => {
         <p className="text-xl text-white mb-6">Make your city a better place with smart garbage detection technology.</p>
         <button
           className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105"
-          onClick={() => window.location.href = '/complaint'}
+          onClick={() => window.location.href = '/ngo/buy'}
         >
-          Report a Complaint
+          Buy Scrap
         </button>
       </div>
+ 
+ 
+      
  
       {/* Dots to show the current image */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
@@ -266,7 +267,6 @@ const TestimonialsSection: React.FC = () => {
     </section>
   );
 };
-
  
 const AboutSection: React.FC = () => {
   return (
