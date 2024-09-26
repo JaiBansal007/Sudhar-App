@@ -171,7 +171,7 @@ const Buy: React.FC = () => {
               </div>
 
               {/* Offer Submission Section */}
-              <div className="offer-section p-4 rounded-lg bg-white shadow-md">
+              <div className="offer-section mt-2 p-4 rounded-lg bg-white shadow-md">
                 {order.status === "accepted" ? (
                   <>
                     <p className="text-green-600 font-semibold text-lg flex justify-between items-center">
