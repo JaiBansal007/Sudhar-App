@@ -139,26 +139,14 @@ const HeroSection: React.FC = () => {
         <p className="text-xl text-white mb-6">Make your city a better place with smart garbage detection technology.</p>
         <button
           className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105"
-          onClick={() => window.location.href = '/complaint'}
+          onClick={() => window.location.href = '/mcd/complaint'}
         >
-          Report a Complaint
+          User Registered Complaints
         </button>
       </div>
  
  
-      {/* Navigation arrows */}
-      <button
-        className="absolute left-4 text-white text-4xl bg-gray-700 rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
-        onClick={prevImage}
-      >
-        &#10094;
-      </button>
-      <button
-        className="absolute right-4 text-white text-4xl bg-gray-700 rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
-        onClick={nextImage}
-      >
-        &#10095;
-      </button>
+      
  
       {/* Dots to show the current image */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
@@ -183,7 +171,7 @@ const FeaturesSection: React.FC = () => {
           {[
             { icon: "🚀", title: "Fast Detection", description: "AI-driven fast and accurate garbage and potholes detection." },
             { icon: "🎁", title: "Voucher Redemption", description: "Redeem your points for exciting rewards and discounts." },
-            { icon: "🗨️", title: "Community Posts", description: "Share updates and engage with others to improve the city." }
+            { icon: "♻️", title: "Sell Scrap", description: "Turn your waste into rewards! Sell scrap and earn points to redeem for exciting vouchers." }
           ].map((feature, index) => (
             <div key={index} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transform transition-transform duration-200 hover:scale-105">
               <div className="text-5xl mb-4">{feature.icon}</div>
