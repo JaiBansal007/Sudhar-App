@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { db ,auth} from "@/firebase/config";
-import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore"; // Firestore functions
+import { collection, query, where, getDocs, updateDoc, doc, getDoc } from "firebase/firestore"; // Firestore functions
 import { toast, Toaster } from "react-hot-toast"; // For toaster message
 import {useRouter} from 'next/navigation';
 import { onAuthStateChanged } from "firebase/auth";
+import { set } from "firebase/database";
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const router = useRouter();
@@ -15,13 +16,14 @@ const Orders: React.FC = () => {
         if (user) {
           console.log(user.uid);
           try {
-            const q = query(collection(db, "sellOrders"), where("id", "==", user.uid));
-            const querySnapshot = await getDocs(q);
-            const ordersData = querySnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            setOrders(ordersData);
+            const userdata=doc(db,"users",user.uid);
+            const usersnap=await getDoc(userdata);
+            if(usersnap){
+              const data=usersnap.data();
+              if(data){
+                setOrders(data["trading"]);
+              }
+            }
           } catch (error) {
             console.error("Error fetching orders: ", error);
             toast.error("Error fetching orders");
@@ -38,18 +40,18 @@ const Orders: React.FC = () => {
   // Handle Accept or Reject Offer
   const handleResponse = async (orderId: string, status: "accepted" | "rejected") => {
     try {
-      const orderRef = doc(db, "sellOrders", orderId);
+      const updatedtrading:any=orders.map((order) =>{
+        if(order.id===orderId){
+          return {...order,status};
+        }
+        return order;
+      });
+      setOrders(updatedtrading);
+      const orderRef = doc(db, "users", orderId);
       await updateDoc(orderRef, {
-        status,
+        trading: updatedtrading,
       });
       toast.success(`Offer ${status === "accepted" ? "accepted" : "rejected"} successfully!`);
-
-      // Refresh orders after updating the status
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order.id === orderId ? { ...order, status } : order
-        )
-      );
     } catch (error) {
       console.error("Error updating order: ", error);
       toast.error("Error updating the order");

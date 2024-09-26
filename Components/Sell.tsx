@@ -1,7 +1,7 @@
 "use client";
 import { useState,useEffect } from "react";
 import { db ,auth } from "@/firebase/config";
-import { collection, addDoc } from "firebase/firestore"; // Firestore functions
+import { collection, addDoc, doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore"; // Firestore functions
 import { toast, Toaster } from "react-hot-toast"; // For toaster message
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -87,7 +87,6 @@ const Sell: React.FC = () => {
     }
     return true;
   };
-
   const handleSubmit = async (e:any) => {
     if (!validateForm()) {
       return; // Stop submission if validation fails
@@ -98,9 +97,8 @@ const Sell: React.FC = () => {
       const img1=await Upload(image);
 
       const img2=await Upload(image2);
-
       const orderData = {
-        id: userId,
+        id:Math.random().toString(36),
         title,
         description,
         quantity,
@@ -114,7 +112,13 @@ const Sell: React.FC = () => {
       };
 
       // Add the order to Firestore
-      await addDoc(collection(db, "sellOrders"), orderData);
+      const user=doc(db,"users",userId);
+       const usersnap=await getDoc(user);
+        if(usersnap.exists()){
+          updateDoc(user,{
+            trading:arrayUnion(orderData)
+          });
+        };
       setLoading(false);
       // Toaster message
       toast.success("Order submitted successfully!");
@@ -166,7 +170,6 @@ const Sell: React.FC = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
           
-          {/* Image Upload Section */}
           <div className="space-y-0">
             <div className="w-auto py-4 bg-gray-50 rounded-lg border border-gray-300 flex items-center md:pl-4">
               <input

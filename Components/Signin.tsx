@@ -70,6 +70,7 @@ export default function Signin(){
           id: userId,
           orders: [],
           complaint: [],
+          trading: [],
           balance: 0,
         });
   

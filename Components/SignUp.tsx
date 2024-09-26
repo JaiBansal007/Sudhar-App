@@ -40,6 +40,7 @@ export default function SignUp(){
           id: res.user.uid,
           orders: [],
           complaint: [],
+          trading: [],
           balance: 0,
         });
 
@@ -70,6 +71,7 @@ export default function SignUp(){
           id: userId,
           orders: [],
           complaint: [],
+          trading: [],
           balance: 0,
         });
   
