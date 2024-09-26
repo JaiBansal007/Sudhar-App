@@ -53,6 +53,14 @@ const Profile: React.FC = () => {
                 Wallet
               </button>
             </Link>
+            <Link href="/ngo/order">
+              <button
+                type="button"
+                className="w-full bg-blue-500 text-white mt-4 py-2 rounded-lg font-semibold hover:bg-blue-600 focus:ring-2 focus:ring-blue-500"
+              >
+                Order
+              </button>
+            </Link>
           </div>
         
               <button
