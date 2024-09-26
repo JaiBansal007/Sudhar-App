@@ -1,32 +1,38 @@
 "use client";
 import { useEffect, useState } from "react";
-import { db } from "@/firebase/config";
+import { db ,auth} from "@/firebase/config";
 import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore"; // Firestore functions
 import { toast, Toaster } from "react-hot-toast"; // For toaster message
-
+import {useRouter} from 'next/navigation';
+import { onAuthStateChanged } from "firebase/auth";
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
-
+  const router = useRouter();
   // Fetch user's orders from Firestore
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        // Assuming you have user authentication and can get the current user ID
-        const userId = "user123"; // Replace with actual user ID from authentication
-        const q = query(collection(db, "sellOrders"), where("userId", "==", userId));
-        const querySnapshot = await getDocs(q);
-        const ordersData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setOrders(ordersData);
-      } catch (error) {
-        console.error("Error fetching orders: ", error);
-        toast.error("Error fetching orders");
-      }
+    const fetchDetails = async () => {
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          console.log(user.uid);
+          try {
+            const q = query(collection(db, "sellOrders"), where("id", "==", user.uid));
+            const querySnapshot = await getDocs(q);
+            const ordersData = querySnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            setOrders(ordersData);
+          } catch (error) {
+            console.error("Error fetching orders: ", error);
+            toast.error("Error fetching orders");
+          }
+        } else {
+          router.push("/signin");
+        }
+      });
     };
 
-    fetchOrders();
+    fetchDetails();
   }, []);
 
   // Handle Accept or Reject Offer
@@ -64,16 +70,21 @@ const Orders: React.FC = () => {
               <h3 className="text-xl font-bold">{order.title}</h3>
               <p>{order.description}</p>
               <p>Quantity: {order.quantity}</p>
+              {/* <p>{order.images[0]}</p> */}
 
               <div className="flex space-x-2 mt-4">
-                {order.images?.map((image: string, index: number) => (
-                  <img
-                    key={index}
-                    src={URL.createObjectURL(new File([image], image))} // Replace this with the correct image handling logic if needed
-                    alt={`Preview ${index}`}
+              <img
+                    key={1}
+                    src={order.images.img1} // Replace this with the correct image handling logic if needed
+                    alt={`Preview ${1}`}
                     className="w-32 h-32 object-cover rounded-lg"
                   />
-                ))}
+                  <img
+                    key={2}
+                    src={order.images.img2} // Replace this with the correct image handling logic if needed
+                    alt={`Preview ${2}`}
+                    className="w-32 h-32 object-cover rounded-lg"
+                  />
               </div>
 
               {order.status === "pending" ? (
@@ -81,7 +92,7 @@ const Orders: React.FC = () => {
               ) : order.status === "offer_made" ? (
                 <div className="space-y-4">
                   <p className="text-green-500 font-semibold">
-                    Dealer's Offer: ₹{order.dealerOffer}
+                    Dealer's Offer: ₹{order.price}
                   </p>
                   <div className="flex space-x-4">
                     <button

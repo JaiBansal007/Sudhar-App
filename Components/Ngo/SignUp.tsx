@@ -25,19 +25,15 @@ export default function SignUp(){
     if(match){
       try {
         const res=await createUserWithEmailAndPassword(auth,email, password);
-        await setDoc(doc(db, "users", res.user.uid), {
+        await setDoc(doc(db, "dealers", res.user.uid), {
           email: email,
           password: password,
           id: res.user.uid,
           orders: [],
           balance: 0,
         });
-
-        await setDoc(doc(db, "post", res.user.uid), {
-          userpost: [],
-        });
         toast.success("Successfully Logged in");
-        router.push("/profile");
+        router.push("/ngo/profile");
       } catch (error) {
         toast.error("Invalid Credentials");
       }
@@ -47,18 +43,15 @@ export default function SignUp(){
     try {
       const res = await signInWithPopup(auth, googleauthprovider);
       console.log(res);
-      await setDoc(doc(db, "users", res.user.uid), {
+      await setDoc(doc(db, "dealers", res.user.uid), {
         email: res.user.email,
         password:"",
         id: res.user.uid,
         orders: [],
         balance: 0,
       });
-      await setDoc(doc(db, "post", res.user.uid), {
-        userpost: [],
-      });
       toast.success("Successfully Logged in");
-      router.push("/profile");
+      router.push("/ngo/profile");
     } catch (error) {
       toast.error("Login Failed");
       console.log(error);

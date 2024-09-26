@@ -1,8 +1,8 @@
 "use client"
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {useRouter} from 'next/navigation'
-import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/firebase/config';
 import {toast} from 'react-toastify';
 const googleauth=new GoogleAuthProvider();
@@ -14,7 +14,7 @@ export default function Signin(){
     const res=signInWithEmailAndPassword(auth,email,password)
     .then(()=>{ 
       toast.success("Successfully Logged in");
-        router.push("/profile");
+        router.push("/ngo/profile");
     } ).catch((error)=>{
       toast.error("Invalid Credentials");
     });
@@ -23,11 +23,18 @@ export default function Signin(){
     signInWithPopup(auth,googleauth)
     .then(()=>{
       toast.success("Successfully Logged in");
-      router.push("/profile");
+      router.push("/ngo/profile");
     }).catch(()=>{
       toast.error("Login Failed");
     });
   }
+  useEffect(()=>{
+      onAuthStateChanged(auth,(user)=>{
+        if(user){
+          router.push("/ngo/profile");
+        }
+      });
+    },[]);
     return (
       <div>
         <section className="bg-gray-50 dark:bg-gray-900">

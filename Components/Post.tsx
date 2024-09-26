@@ -70,11 +70,10 @@ export default function Post() {
           setUserId(user.uid);
         } else {
           // Redirect to login page if user is not logged in
-          router.push("/login");
+          router.push("/signin");
         }
       });
 
-      return () => unsubscribe(); // Cleanup on component unmount
     }, []);
 
     return (

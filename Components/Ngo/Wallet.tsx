@@ -21,7 +21,7 @@ const Wallet: React.FC = () => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUserId(user.uid);
-        const userRef = doc(db, "users", user.uid);
+        const userRef = doc(db, "dealers", user.uid);
         const userSnap = await getDoc(userRef);
 
         if (userSnap.exists()) {
@@ -34,7 +34,7 @@ const Wallet: React.FC = () => {
           setTransactions(sortedTransactions);
         }
       } else {
-        router.push("/login");
+        router.push("/ngo/signin");
       }
     });
   }, [router]);

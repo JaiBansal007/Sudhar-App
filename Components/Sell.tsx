@@ -1,8 +1,13 @@
 "use client";
-import { useState } from "react";
-import { db } from "@/firebase/config";
+import { useState,useEffect } from "react";
+import { db ,auth } from "@/firebase/config";
 import { collection, addDoc } from "firebase/firestore"; // Firestore functions
 import { toast, Toaster } from "react-hot-toast"; // For toaster message
+import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import Upload from '@/firebase/upload'; // Assuming this uploads the image to Firebase Storage
+import Loading from "./Loading";
+
 
 const statesWithDistricts: { [key: string]: string[] } = {
   "Uttar Pradesh": ["Lucknow", "Kanpur", "Varanasi"],
@@ -12,28 +17,30 @@ const statesWithDistricts: { [key: string]: string[] } = {
 };
 
 const Sell: React.FC = () => {
+  const [userId, setUserId] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [quantityType, setQuantityType] = useState("number"); // "number" or "weight"
   const [quantity, setQuantity] = useState("");
-
-  // New state variables for address
   const [state, setState] = useState("");
   const [district, setDistrict] = useState("");
   const [address, setAddress] = useState("");
-
+  const [image, setImage] = useState(null);
+  const [image2, setImage2] = useState(null);
+  const [imagePreview, setImagePreview] = useState<string|null>(null); // State to hold image preview URL
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   // Restrict to image file types and show image preview
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const validImages = files.filter((file) =>
-      ["image/jpeg", "image/png", "image/jpg"].includes(file.type)
-    );
-    if (validImages.length === files.length) {
-      setImages((prev) => [...prev, ...validImages]);
-    } else {
-      toast.error("Only image files (jpg, jpeg, png) are allowed.");
+  const handleImageUpload = (e:any) => {
+    const file = e.target.files[0];
+    if (image==null) {
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file)); // Create a preview URL for the selected image
+    }else{
+      setImage2(e.target.files[0]);
     }
+    setImages((prev) => [...prev, file]);
   };
 
   // Handle image deletion
@@ -81,37 +88,61 @@ const Sell: React.FC = () => {
     return true;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e:any) => {
     if (!validateForm()) {
       return; // Stop submission if validation fails
     }
-
+    
     try {
+      setLoading(true);
+      const img1=await Upload(image);
+
+      const img2=await Upload(image2);
+
       const orderData = {
+        id: userId,
         title,
         description,
         quantity,
-        images: images.map((img) => img.name), // In a real app, you'll upload these to a storage service like Firebase Storage
+        images:{img1,img2}, // In a real app, you'll upload these to a storage service like Firebase Storage
         status: "pending", // initial status
         createdAt: new Date(),
         state,
         district,
         address,
+        price:0
       };
 
       // Add the order to Firestore
       await addDoc(collection(db, "sellOrders"), orderData);
-
+      setLoading(false);
       // Toaster message
       toast.success("Order submitted successfully!");
 
       // Redirect to the orders page after submission using window.location.href
-      window.location.href = "/order"; // Redirect to the orders page
+      router.push("/order");
     } catch (error) {
       console.error("Error adding document: ", error);
       toast.error("Error submitting the order");
     }
   };
+
+
+
+    useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setUserId(user.uid);
+        } else {
+          // Redirect to login page if user is not logged in
+          router.push("/signin");
+        }
+      });
+      
+    }, []);
+    if(loading){
+      return <Loading />;
+    }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -134,15 +165,15 @@ const Sell: React.FC = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
-
+          
           {/* Image Upload Section */}
-          <div className="space-y-4">
-            <div className="w-full p-4 bg-gray-50 rounded-lg border border-gray-300 flex justify-center items-center">
+          <div className="space-y-0">
+            <div className="w-auto py-4 bg-gray-50 rounded-lg border border-gray-300 flex items-center md:pl-4">
               <input
                 type="file"
                 multiple
                 accept="image/png, image/jpeg, image/jpg"
-                className="cursor-pointer"
+                className="cursor-pointer rounded-lg"
                 onChange={handleImageUpload}
               />
             </div>
@@ -185,9 +216,9 @@ const Sell: React.FC = () => {
                 <option value="" disabled>
                   Select Number
                 </option>
-                {[...Array(10).keys()].map((n) => (
-                  <option key={n + 1} value={n + 1}>
-                    {n + 1}
+                {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
+                  <option key={num} value={num}>
+                    {num}
                   </option>
                 ))}
               </select>
