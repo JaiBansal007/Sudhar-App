@@ -11,18 +11,17 @@ export default function Chatbot() {
     { 
       type: 'incoming', 
       message: 'Hi there 👋 How can I help you today?', 
-      suggestions: ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us']
+      suggestions: ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us', 'Sell Scrap'] // Added 'Sell Scrap'
     },
   ]);
 
   const chatInputRef = useRef(null);
-  const chatboxRef = useRef<HTMLUListElement | null>(null); // Refers to a <ul> element
+  const chatboxRef = useRef<HTMLUListElement | null>(null);
   const router = useRouter();
   
   useEffect(() => {
     const chatbox = chatboxRef.current;
     if (chatbox) {
-      // Ensure scrollHeight exists, otherwise fall back to 0
       chatbox.scrollTop = chatbox.scrollHeight ?? 0;
     }
   }, [chatMessages]);
@@ -59,9 +58,7 @@ export default function Chatbot() {
       const data = await res.json();
       const responseMessage = data.candidates[0].content.parts[0].text;
 
-      // Provide suggestions based on the bot's response
       const suggestions = generateSuggestions(responseMessage);
-
       updateLastMessage(responseMessage, suggestions);
     } catch (error) {
       updateLastMessage('Oops! Something went wrong. Please try again later.', [], true);
@@ -70,7 +67,7 @@ export default function Chatbot() {
 
   const generateSuggestions = (responseMessage: string) => {
     if (responseMessage.toLowerCase().includes('help')) {
-      return ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us'];
+      return ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us', 'Sell Scrap']; // Added 'Sell Scrap'
     }
     if (responseMessage.toLowerCase().includes('complaint')) {
       return ['Lodge a Complaint', 'View Past Complaints'];
@@ -136,9 +133,9 @@ export default function Chatbot() {
         const { balance, transactions } = await fetchWalletDetails(userId);
         
         const walletMessage =
-          `Available Coins: ${balance}\n\n` + // Ensure new line after balance
-          `Latest Transactions:\n` + // Start transactions on a new line
-          transactions.map((t: any) => `${t.time.substring(0, 10)} - ${t.voucherName}: ${t.voucherPrice}`).join('\n'); // Each transaction on a new line
+          `Available Coins: ${balance}\n\n` +
+          `Latest Transactions:\n` +
+          transactions.map((t: any) => `${t.time.substring(0, 10)} - ${t.voucherName}: ${t.voucherPrice}`).join('\n');
       
         addMessage(walletMessage, 'incoming');
       } else if (suggestion === 'Contact Us') {
@@ -148,9 +145,11 @@ export default function Chatbot() {
         const complaintsMessage = complaints.length
           ? complaints.map((c: any) => 
               `Title: ${c.title}\nStatus: ${c.status}\nDescription: ${c.description}`
-            ).join('\n\n') // Ensure new lines between complaints
+            ).join('\n\n')
           : 'You have no registered complaints.';
         addMessage(complaintsMessage, 'incoming');
+      } else if (suggestion === 'Sell Scrap') { // Handling for the new suggestion
+        router.push('/sell');
       } else {
         addMessage(`You selected "${suggestion}"`, 'incoming', generateSuggestions(''));
       }
