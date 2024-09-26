@@ -76,6 +76,14 @@ const Buy: React.FC = () => {
   // Handle offer submission
   const handleSubmitOffer = async (props: any) => {
     try {
+      if(number<=0){
+        toast.error("Please enter a valid amount!");
+        return;
+      }
+      if(number>100000){
+        toast.error("Please enter a valid amount!");
+        return;
+      }
       const userRef = doc(db, "users", props.userid);
       const userSnap = await getDoc(userRef);
 
