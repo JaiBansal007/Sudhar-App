@@ -11,7 +11,7 @@ export default function Chatbot() {
     { 
       type: 'incoming', 
       message: 'Hi there 👋 How can I help you today?', 
-      suggestions: ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us', 'Sell Scrap'] // Added 'Sell Scrap'
+      suggestions: ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us', 'Sell Scrap', 'Scrap Orders'] // Added 'Scrap Orders'
     },
   ]);
 
@@ -67,7 +67,7 @@ export default function Chatbot() {
 
   const generateSuggestions = (responseMessage: string) => {
     if (responseMessage.toLowerCase().includes('help')) {
-      return ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us', 'Sell Scrap']; // Added 'Sell Scrap'
+      return ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us', 'Sell Scrap', 'Scrap Orders']; // Added 'Scrap Orders'
     }
     if (responseMessage.toLowerCase().includes('complaint')) {
       return ['Lodge a Complaint', 'View Past Complaints'];
@@ -112,6 +112,23 @@ export default function Chatbot() {
     return [];
   };
 
+  const fetchOrderDetails = async (userId: string) => {
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const { trading } = userSnap.data();
+      const sortedOrders = trading
+        ? trading.sort((a: { time: string | Date }, b: { time: string | Date }) => 
+            new Date(b.time).getTime() - new Date(a.time).getTime()
+          ).slice(0, 3)
+        : [];
+
+      return sortedOrders;
+    }
+    return [];
+  };
+
   const handleSuggestionClick = async (suggestion: string) => {
     setChatMessages((prevMessages) => [
       ...prevMessages,
@@ -148,8 +165,16 @@ export default function Chatbot() {
             ).join('\n\n')
           : 'You have no registered complaints.';
         addMessage(complaintsMessage, 'incoming');
-      } else if (suggestion === 'Sell Scrap') { // Handling for the new suggestion
+      } else if (suggestion === 'Sell Scrap') {
         router.push('/sell');
+      } else if (suggestion === 'Scrap Orders') { // New handling for Scrap Orders
+        const orders = await fetchOrderDetails(userId);
+        const ordersMessage = orders.length
+          ? orders.map((o: any) => 
+              `\nTitle: ${o.title}\nStatus: ${o.status}\nDescription: ${o.description}\nPrice: ₹${o.price}`
+            ).join('\n\n')
+          : 'You have no recent scrap orders.';
+        addMessage(ordersMessage, 'incoming');
       } else {
         addMessage(`You selected "${suggestion}"`, 'incoming', generateSuggestions(''));
       }
@@ -191,45 +216,53 @@ export default function Chatbot() {
             {chatMessages.map((chat, index) => (
               <li key={index} className={`flex ${chat.type === 'incoming' ? 'justify-start' : 'justify-end'}`}>
                 {chat.type === 'incoming' ? (
-                  <div className="bg-gray-200 text-gray-800 p-3 rounded-2xl shadow-md max-w-xs whitespace-pre-line">
-                    <p>{chat.message}</p>
-                    {chat.suggestions && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {chat.suggestions.map((suggestion, i) => (
-                          <button
-                            key={i}
-                            className="bg-blue-500 text-white py-1 px-3 rounded-xl text-sm hover:bg-blue-700 transition-all"
+                  <div className="bg-gray-100 text-gray-900 p-3 rounded-lg shadow-lg text-sm max-w-xs">
+                    {chat.message.split('\n').map((line, idx) => (
+                      <p key={idx}>{line}</p>
+                    ))}
+
+                    {/* Suggestions */}
+                    {chat.suggestions.length > 0 && (
+                      <ul className="mt-2 flex flex-wrap gap-2">
+                        {chat.suggestions.map((suggestion, idx) => (
+                          <li
+                            key={idx}
+                            className="cursor-pointer bg-blue-600 text-white px-2 py-1 rounded-lg shadow-sm text-m"
                             onClick={() => handleSuggestionClick(suggestion)}
                           >
                             {suggestion}
-                          </button>
+                          </li>
                         ))}
-                      </div>
+                      </ul>
                     )}
                   </div>
                 ) : (
-                  <div className="bg-blue-600 text-white p-3 rounded-2xl shadow-md max-w-xs whitespace-pre-line">
-                    <p>{chat.message}</p>
+                  <div className="bg-blue-500 text-white p-3 rounded-lg shadow-lg text-sm max-w-xs">
+                    {chat.message.split('\n').map((line, idx) => (
+                      <p key={idx}>{line}</p>
+                    ))}
                   </div>
                 )}
               </li>
             ))}
           </ul>
 
-          {/* Input area */}
-          <div className="flex items-center p-3 bg-gray-100">
-            <textarea
-              className="flex-1 p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Type Hi or Ask General Queries..."
+          {/* Input and send button */}
+          <div className="p-4 bg-gray-100 flex items-center space-x-4">
+            <input
+              type="text"
+              className="flex-grow p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Type Hi or Ask any General Query"
               value={userMessage}
               onChange={(e) => setUserMessage(e.target.value)}
               ref={chatInputRef}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
             />
             <button
-              className="ml-2 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-700 transition-all"
               onClick={handleSendMessage}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
             >
-              <span className="material-symbols-outlined">send</span>
+              Send
             </button>
           </div>
         </div>

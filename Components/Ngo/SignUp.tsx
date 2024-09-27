@@ -42,7 +42,7 @@ export default function SignUp(){
   const googleregister = async () => {
     try {
       const res = await signInWithPopup(auth, googleauthprovider);
-      console.log(res);
+      
       await setDoc(doc(db, "dealers", res.user.uid), {
         email: res.user.email,
         password:"",

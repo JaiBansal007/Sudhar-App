@@ -3,8 +3,9 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {useRouter} from 'next/navigation'
 import { GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth } from '@/firebase/config';
+import { auth, db } from '@/firebase/config';
 import {toast} from 'react-toastify';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 const googleauth=new GoogleAuthProvider();
 export default function Signin(){
   const [email, setEmail] = useState("");
@@ -19,15 +20,36 @@ export default function Signin(){
       toast.error("Invalid Credentials");
     });
   }
-  const signinwithgoogle=()=>{
-    signInWithPopup(auth,googleauth)
-    .then(()=>{
-      toast.success("Successfully Logged in");
-      router.push("/ngo/profile");
-    }).catch(()=>{
-      toast.error("Login Failed");
-    });
-  }
+  const signinwithgoogle = () => {
+    signInWithPopup(auth, googleauth)
+      .then(async (res) => {
+        const userDocRef = doc(db, "dealers", res.user.uid);
+        
+        // Check if the user already exists
+        const userDocSnap = await getDoc(userDocRef);
+  
+        if (!userDocSnap.exists()) {
+          // If the user does not exist, create the document
+          await setDoc(userDocRef, {
+            email: res.user.email,
+            password: "",
+            id: res.user.uid,
+            orders: [],
+            balance: 0,
+          });
+          toast.success("Successfully Logged in and Profile Created");
+        } else {
+          // If the user exists, you can update certain fields if needed
+          await updateDoc(userDocRef, { lastLogin: new Date() });
+          toast.success("Welcome Back!");
+        }
+        
+        router.push("/ngo/profile");
+      })
+      .catch(() => {
+        toast.error("Login Failed");
+      });
+  };
   useEffect(()=>{
       onAuthStateChanged(auth,(user)=>{
         if(user){

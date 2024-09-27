@@ -186,10 +186,10 @@ const Sell: React.FC = () => {
                   <img
                     src={URL.createObjectURL(image)}
                     alt="Uploaded Preview"
-                    className="w-32 h-32 object-cover rounded-lg shadow-lg"
+                    className="w-32 h-32 mt-2 object-cover rounded-lg shadow-lg"
                   />
                   <button
-                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full"
+                    className="absolute top-2 right-1 bg-red-500 text-white p-1 rounded-full"
                     onClick={() => handleDeleteImage(index)}
                   >
                     X
