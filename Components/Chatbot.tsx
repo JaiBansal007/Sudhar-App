@@ -11,7 +11,7 @@ export default function Chatbot() {
     { 
       type: 'incoming', 
       message: 'Hi there 👋 How can I help you today?', 
-      suggestions: ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us', 'Sell Scrap', 'Scrap Orders'] // Added 'Scrap Orders'
+      suggestions: ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us', 'Sell Scrap', 'Scrap Orders'] 
     },
   ]);
 
@@ -67,7 +67,7 @@ export default function Chatbot() {
 
   const generateSuggestions = (responseMessage: string) => {
     if (responseMessage.toLowerCase().includes('help')) {
-      return ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us', 'Sell Scrap', 'Scrap Orders']; // Added 'Scrap Orders'
+      return ['Lodge a Complaint', 'View Past Complaints', 'Open Wallet', 'Contact Us', 'Sell Scrap', 'Scrap Orders'];
     }
     if (responseMessage.toLowerCase().includes('complaint')) {
       return ['Lodge a Complaint', 'View Past Complaints'];
@@ -149,10 +149,23 @@ export default function Chatbot() {
       } else if (suggestion === 'Open Wallet') {
         const { balance, transactions } = await fetchWalletDetails(userId);
         
-        const walletMessage =
-          `Available Coins: ${balance}\n\n\n` +
-          `Latest Transactions:\n` +
-          transactions.map((t: any) => `${t.time.substring(0, 10)} - ${t.voucherName}: ${t.voucherPrice}`).join('\n\n\n');
+
+        const walletMessage = (
+          <div>
+            <div>Available Coins: {balance}</div>
+            <div>Latest Transactions:</div>
+            {transactions.length > 0 ? (
+              transactions.map((t: any, index: number) => (
+                <div key={index} className="mb-2">
+                  {`${t.time.substring(0, 10)} - ${t.voucherName}: ${t.voucherPrice}`}
+                </div>
+              ))
+            ) : (
+              <div>No recent transactions.</div>
+            )}
+          </div>
+        );
+
 
         addMessage(walletMessage, 'incoming');
       } else if (suggestion === 'Contact Us') {
@@ -161,19 +174,34 @@ export default function Chatbot() {
         const complaints = await fetchComplaints(userId);
         const complaintsMessage = complaints.length
           ? complaints.map((c: any) => 
-              `Title: ${c.title}\nStatus: ${c.status}\nDescription: ${c.description}`
-            ).join('\n\n')
-          : 'You have no registered complaints.';
+              <div key={c.title} className="mb-2">
+                {`Title: ${c.title}`}<br />
+                {`Status: ${c.status}`}<br />
+                {`Description: ${c.description}`}
+              </div>
+            )
+          : <div>You have no registered complaints.</div>;
         addMessage(complaintsMessage, 'incoming');
       } else if (suggestion === 'Sell Scrap') {
         router.push('/sell');
-      } else if (suggestion === 'Scrap Orders') { // New handling for Scrap Orders
+      } else if (suggestion === 'Scrap Orders') {
         const orders = await fetchOrderDetails(userId);
-        const ordersMessage = orders.length
-          ? orders.map((o: any) => 
-              `\nTitle: ${o.title}\nStatus: ${o.status}\nDescription: ${o.description}\nPrice: ₹${o.price}`
-            ).join('\n\n')
-          : 'You have no recent scrap orders.';
+        const ordersMessage = (
+          <div>
+            {orders.length > 0 ? (
+              orders.map((o: any, index: number) => (
+                <div key={index} className="mb-2">
+                  {`Title: ${o.title}`}<br />
+                  {`Status: ${o.status}`}<br />
+                  {`Description: ${o.description}`}<br />
+                  {`Price: ₹${o.price}`}
+                </div>
+              ))
+            ) : (
+              <div>You have no recent scrap orders.</div>
+            )}
+          </div>
+        );
         addMessage(ordersMessage, 'incoming');
       } else {
         addMessage(`You selected "${suggestion}"`, 'incoming', generateSuggestions(''));
@@ -209,58 +237,42 @@ export default function Chatbot() {
         <div className="fixed right-4 bottom-20 w-72 md:w-80 lg:w-96 bg-white rounded-xl shadow-2xl overflow-hidden transition-transform transform scale-100 opacity-100">
           <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex justify-between items-center rounded-t-xl shadow-sm">
             <h2 className="font-semibold">Sudhaar Mitra</h2>
+            <button onClick={toggleChatbot} className="text-xl">&times;</button>
           </header>
-
-          {/* Chat messages */}
-          <ul className="h-80 p-4 space-y-4 overflow-y-auto" ref={chatboxRef}>
-            {chatMessages.map((chat, index) => (
-              <li key={index} className={`flex ${chat.type === 'incoming' ? 'justify-start' : 'justify-end'}`}>
-                {chat.type === 'incoming' ? (
-                  <div className="bg-gray-100 text-gray-900 p-3 rounded-lg shadow-lg text-sm max-w-xs">
-                    {chat.message.split('\n').map((line, idx) => (
-                      <p key={idx}>{line}</p>
-                    ))}
-
-                    {/* Suggestions */}
-                    {chat.suggestions.length > 0 && (
-                      <ul className="mt-2 flex flex-wrap gap-2">
-                        {chat.suggestions.map((suggestion, idx) => (
-                          <li
-                            key={idx}
-                            className="cursor-pointer bg-blue-600 text-white px-2 py-1 rounded-lg shadow-sm text-m"
-                            onClick={() => handleSuggestionClick(suggestion)}
-                          >
-                            {suggestion}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ) : (
-                  <div className="bg-blue-500 text-white p-3 rounded-lg shadow-lg text-sm max-w-xs">
-                    {chat.message.split('\n').map((line, idx) => (
-                      <p key={idx}>{line}</p>
-                    ))}
-                  </div>
-                )}
+          <ul ref={chatboxRef} className="h-72 md:h-80 lg:h-80 overflow-y-auto p-4 space-y-2">
+            {chatMessages.map((msg, index) => (
+              <li key={index} className={`flex ${msg.type === 'incoming' ? 'justify-start' : 'justify-end'}`}>
+                <div className={`p-2 min-w-48 rounded-lg ${msg.type === 'incoming' ? 'bg-gray-200' : 'bg-blue-500 text-white'}`}>
+                  {msg.message}
+                  {msg.suggestions.length > 0 && (
+                    <div className="mt-2 flex flex-wrap">
+                      {msg.suggestions.map((suggestion, index) => (
+                        <button 
+                          key={index} 
+                          className="bg-blue-600 text-white rounded-lg px-2 py-1 mr-2 mb-2 hover:bg-blue-700"
+                          onClick={() => handleSuggestionClick(suggestion)}
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
-
-          {/* Input and send button */}
-          <div className="p-4 bg-gray-100 flex items-center space-x-4">
+          <div className="flex p-4">
             <input
               type="text"
-              className="flex-grow p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Type Hi or Ask any General Query"
+              ref={chatInputRef}
               value={userMessage}
               onChange={(e) => setUserMessage(e.target.value)}
-              ref={chatInputRef}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              className="border rounded-lg flex-grow p-2"
+              placeholder="Type Hi or Ask any General Query"
             />
             <button
               onClick={handleSendMessage}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
+              className="bg-blue-600 text-white rounded-lg px-4 ml-2"
             >
               Send
             </button>

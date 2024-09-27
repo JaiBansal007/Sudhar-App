@@ -139,12 +139,20 @@ const HeroSection: React.FC = () => {
       <div className="relative text-center">
         <h1 className="text-5xl font-extrabold text-white mb-4">Join Us in Keeping Our City Clean</h1>
         <p className="text-xl text-white mb-6">Make your city a better place with smart garbage detection technology.</p>
-        <button
-          className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105"
-          onClick={() => window.location.href = '/complaint'}
-        >
-          Report a Complaint
-        </button>
+        <div className="flex flex-col md:flex-row gap-5 justify-center items-center mt-10">
+          <button
+            className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105"
+            onClick={() => window.location.href = '/sell'}
+          >
+            Sell Scrap
+          </button>
+          <button
+            className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105"
+            onClick={() => window.location.href = '/complaint'}
+          >
+            Report Complaint
+          </button>
+        </div>
       </div>
  
       {/* Dots to show the current image */}
