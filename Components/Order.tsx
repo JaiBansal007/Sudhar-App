@@ -27,7 +27,6 @@ const Orders: React.FC = () => {
                 setOrders(data["trading"]);
               }
             }
-            setLoading(false);
           } catch (error) {
             console.error("Error fetching orders: ", error);
             toast.error("Error fetching orders");
@@ -35,6 +34,7 @@ const Orders: React.FC = () => {
         } else {
           router.push("/signin");
         }
+        setLoading(false);
       });
     };
     fetchDetails();
@@ -123,7 +123,7 @@ const Orders: React.FC = () => {
               ) : order.status === "rejected" ? (
                 <p className="text-red-500 font-semibold">Offer Rejected</p>
               ) : order.status === "payment_done" ? (
-                <p className="text-green-500 font-semibold">Payment Done</p>):null}
+                <p className="text-green-500 font-semibold flex flex-col">Payment Done. <span className="text-sm">Now dealer will collect scrap from your house</span> </p>):null}
             </div>
           ))
         )}

@@ -169,9 +169,13 @@ const Buy: React.FC = () => {
               time: new Date().toISOString(),
             }),
             balance: increment(-selectedOrder.price),
-          });
+          }).then(()=>{
+            toast.success("Payment successful!");
+            
+          }).then(()=>{
+            router.push("/ngo/wallet");
+        });
         }
-        toast.success("Payment successful!");
         setShowPaymentPopup(false);
         fetchPosts();
       }
