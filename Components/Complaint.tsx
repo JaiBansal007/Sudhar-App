@@ -8,6 +8,7 @@ import { arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import emailjs from 'emailjs-com';
+import Loading from './Loading';
 interface PredictionResult {
   text: string;
   color: string;
@@ -230,7 +231,9 @@ const startCamera = () => {
       setLoading(false);
     }
   };
+
   const handleSubmit = async() => {
+    setLoading(true);
     if (formValid) {
       await onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -276,7 +279,7 @@ const startCamera = () => {
         complaint_location: address, // Complaint location
         timestamp: new Date().toLocaleString(), // Timestamp for the complaint
       };
-  
+      
       emailjs
         .send(
           'service_9u9o46j', // Replace with your EmailJS service ID
@@ -295,9 +298,11 @@ const startCamera = () => {
     } else {
       toast.error("Please validate the images before submitting");
     }
+    setLoading(false);
   };
-  
-
+  if(loading){
+    return <Loading/>
+  }
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">

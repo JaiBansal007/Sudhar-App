@@ -149,6 +149,7 @@ export default function Chatbot() {
       } else if (suggestion === 'Open Wallet') {
         const { balance, transactions } = await fetchWalletDetails(userId);
         
+
         const walletMessage = (
           <div>
             <div>Available Coins: {balance}</div>
@@ -164,6 +165,7 @@ export default function Chatbot() {
             )}
           </div>
         );
+
 
         addMessage(walletMessage, 'incoming');
       } else if (suggestion === 'Contact Us') {

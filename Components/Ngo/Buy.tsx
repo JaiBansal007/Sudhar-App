@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import app, { auth, db } from "@/firebase/config";
-import { collection, query, getDocs, updateDoc, doc, where, getFirestore, getDoc } from "firebase/firestore"; // Firestore functions
+import { collection, query, getDocs, updateDoc, doc, where, getFirestore, getDoc, arrayUnion, increment, or } from "firebase/firestore"; // Firestore functions
 import { toast, Toaster } from "react-hot-toast"; // For toaster message
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,7 @@ const Buy: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [dealerid, setDealerid] = useState<string>("");
   const fetchPosts = async () => {
     try {
       const postsRef = collection(firestore, "users");
@@ -76,8 +76,10 @@ const Buy: React.FC = () => {
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
+        
         router.push("/ngo/login");
       } else {
+        setDealerid(user.uid);
         await fetchWalletBalance(user.uid);
       }
     });
@@ -120,6 +122,11 @@ const Buy: React.FC = () => {
   };
 
   const handleMakePayment = (order: any) => {
+    if(order.price > walletBalance){
+      toast.error("Insufficient balance for payment!");
+      return;
+    }
+    console.log("Order:", order);
     setSelectedOrder(order);
     setShowPaymentPopup(true);
   };
@@ -127,12 +134,53 @@ const Buy: React.FC = () => {
   const handlePaymentSubmit = async () => {
     if (selectedOrder && walletBalance >= selectedOrder.price) {
       // Process the payment here (update Firestore, etc.)
-      toast.success("Payment successful!");
-      setShowPaymentPopup(false);
-      // Optionally, refresh the wallet balance and orders
-      await fetchWalletBalance(auth.currentUser?.uid);
-      fetchPosts();
-    } else {
+      const userRef = doc(db, "users", selectedOrder.userid);
+      const userSnap = await getDoc(userRef);
+      if(userSnap.exists()){
+        const userData = userSnap.data();
+        const trading = userData.trading || [];
+        const updatedTrading = trading.map((order: any) => {
+          if (order.id === selectedOrder.orderid) {
+            return {
+              ...order,
+              status: "payment_done", // Update the status
+            };
+          }
+          return order; // Return unchanged orders
+        });
+        
+        // Update the user document with new orders and updated trading
+        await updateDoc(userRef, {
+          orders: arrayUnion({
+            voucherName: selectedOrder.description,
+            voucherPrice: selectedOrder.price*0.9,
+            time: new Date().toISOString(),
+          }),
+          trading: updatedTrading, // Use the modified trading array
+          balance: increment(selectedOrder.price * 0.9),
+        });
+        const dealerRef = doc(db, "dealers", dealerid);
+        const dealerSnap = await getDoc(dealerRef);
+        if(dealerSnap.exists()){
+          await updateDoc(dealerRef, {
+            orders: arrayUnion({
+              voucherName: selectedOrder.description,
+              voucherPrice: -selectedOrder.price,
+              time: new Date().toISOString(),
+            }),
+            balance: increment(-selectedOrder.price),
+          }).then(()=>{
+            toast.success("Payment successful!");
+            
+          }).then(()=>{
+            router.push("/ngo/wallet");
+        });
+        }
+        setShowPaymentPopup(false);
+        fetchPosts();
+      }
+
+    }else{
       toast.error("Insufficient balance for payment!");
     }
   };
@@ -149,8 +197,10 @@ const Buy: React.FC = () => {
         {orders.length === 0 ? (
           <p className="text-center">No orders available.</p>
         ) : (
-          orders.map((order) => (
-            <div key={order.id} className="p-4 bg-gray-50 rounded-lg shadow">
+          orders.map((order) => 
+            order.status!="payment_done" &&(
+              <>
+              <div key={order.id} className="p-4 bg-gray-50 rounded-lg shadow">
               <h3 className="text-xl font-bold mb-2">{order.title}</h3>
               <p className="text-gray-600">Description: {order.description}</p>
               <p className="text-gray-600">Quantity: {order.quantity}</p>
@@ -225,11 +275,7 @@ const Buy: React.FC = () => {
                 )}
               </div>
             </div>
-          ))
-        )}
-
-        {/* Payment Popup */}
-        {showPaymentPopup && selectedOrder && (
+            {showPaymentPopup && selectedOrder && (
           <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-80 max-w-full">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Make Payment</h4>
@@ -253,6 +299,13 @@ const Buy: React.FC = () => {
             </div>
           </div>
         )}
+              </>
+            )
+          )
+        )}
+
+        {/* Payment Popup */}
+
       </div>
     </div>
   );
