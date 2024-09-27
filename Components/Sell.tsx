@@ -8,13 +8,26 @@ import { useRouter } from "next/navigation";
 import Upload from '@/firebase/upload'; // Assuming this uploads the image to Firebase Storage
 import Loading from "./Loading";
 
-
 const statesWithDistricts: { [key: string]: string[] } = {
   "Uttar Pradesh": ["Lucknow", "Kanpur", "Varanasi"],
   "Maharashtra": ["Mumbai", "Pune", "Nagpur"],
   "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
+  "Delhi": [
+    "Central Delhi",
+    "East Delhi",
+    "New Delhi",
+    "North Delhi",
+    "North East Delhi",
+    "North West Delhi",
+    "Shahdara",
+    "South Delhi",
+    "South East Delhi",
+    "South West Delhi",
+    "West Delhi"
+  ],
   // Add more states and districts here
 };
+
 
 const Sell: React.FC = () => {
   const [userId, setUserId] = useState("");
