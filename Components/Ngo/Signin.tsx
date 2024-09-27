@@ -36,8 +36,9 @@ export default function Signin(){
             id: res.user.uid,
             orders: [],
             balance: 0,
+            trading:[]
           });
-          toast.success("Successfully Logged in and Profile Created");
+          toast.success("Successfully Logged in");
         } else {
           // If the user exists, you can update certain fields if needed
           await updateDoc(userDocRef, { lastLogin: new Date() });

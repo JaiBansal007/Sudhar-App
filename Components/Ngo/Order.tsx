@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import app, { auth, db } from "@/firebase/config";
-import { collection, getDocs, getFirestore } from "firebase/firestore"; // Firestore functions
+import { arrayUnion, collection, doc, getDoc, getDocs, getFirestore, updateDoc } from "firebase/firestore"; // Firestore functions
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import Loading from "../Loading";
@@ -12,45 +12,17 @@ const PastOrders: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
-
-  const fetchPaidOrders = async () => {
+  const [userid, setUserid] = useState<string>("");
+  const fetchPaidOrders = async (props:any) => {
     try {
-      const postsRef = collection(firestore, "users");
-      const data = await getDocs(postsRef);
-      const userRecord = data.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      const formatUserPosts = (rawPosts: any[]): any[] => {
-        const combinedPosts = rawPosts.flatMap((user) => {
-          if (user.trading && user.trading.length > 0) {
-            return user.trading
-              .filter((post: any) => post.status === "payment_done") // Show only orders with payment done
-              .map((post: any) => ({
-                userid: user.id,
-                useremail: user.email,
-                orderid: post.id,
-                title: post.title,
-                description: post.description,
-                quantity: post.quantity,
-                images: post.images,
-                price: post.price,
-                status: post.status,
-                createdAt: post.createdAt,
-                state: post.state,
-                district: post.district,
-                useraddress: post.address, // Assuming this is the detailed address
-              }));
+        const dealerdoc=await getDoc(doc(db,"dealers",props ));
+        if(dealerdoc.exists()){
+          const dealerdata=dealerdoc.data();
+          if(dealerdata){
+            const orders=dealerdata["trading"];
+            setOrders(orders);
           }
-          return [];
-        });
-
-        return combinedPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      };
-
-      const combinedPostsArray = formatUserPosts(userRecord);
-      setOrders(combinedPostsArray);
+        }
       setLoading(false);
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -61,10 +33,13 @@ const PastOrders: React.FC = () => {
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         router.push("/ngo/signin");
+      }else{
+        setUserid(user.uid);
+        fetchPaidOrders(user.uid);
+
       }
     });
     setLoading(true);
-    fetchPaidOrders();
   }, []);
 
   if (loading) {
@@ -79,7 +54,7 @@ const PastOrders: React.FC = () => {
         {orders.length === 0 ? (
           <p className="text-center">No paid orders available.</p>
         ) : (
-          orders.map((order) =>(
+          orders.map((order) =>order.status=="payment_done"&&(
             <div key={order.id} className="p-4 bg-gray-50 rounded-lg shadow">
               <h3 className="text-xl font-bold mb-2">{order.title}</h3>
               <p className="text-gray-600">Description: {order.description}</p>

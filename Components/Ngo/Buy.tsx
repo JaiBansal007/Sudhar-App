@@ -45,6 +45,7 @@ const Buy: React.FC = () => {
               state: post.state,
               district: post.district,
               useraddress: post.address,
+              dealerid: post.dealerid,
             }));
           }
           return [];
@@ -77,7 +78,7 @@ const Buy: React.FC = () => {
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         
-        router.push("/ngo/login");
+        router.push("/ngo/signin");
       } else {
         setDealerid(user.uid);
         await fetchWalletBalance(user.uid);
@@ -105,6 +106,7 @@ const Buy: React.FC = () => {
               ...complaint,
               price: number,
               status: "offer_made",
+              dealerid: dealerid,
             };
           }
           return complaint;
@@ -168,6 +170,10 @@ const Buy: React.FC = () => {
               voucherPrice: -selectedOrder.price,
               time: new Date().toISOString(),
             }),
+            trading: arrayUnion({
+              ...selectedOrder,
+              status: "payment_done",
+            }),
             balance: increment(-selectedOrder.price),
           }).then(()=>{
             toast.success("Payment successful!");
@@ -198,7 +204,7 @@ const Buy: React.FC = () => {
           <p className="text-center">No orders available.</p>
         ) : (
           orders.map((order) => 
-            order.status!="payment_done" &&(
+            order.status!="payment_done" &&(order.status=="accepted"?order.dealerid==dealerid:true)&&(
               <>
               <div key={order.id} className="p-4 bg-gray-50 rounded-lg shadow">
               <h3 className="text-xl font-bold mb-2">{order.title}</h3>

@@ -30,6 +30,7 @@ export default function SignUp(){
           password: password,
           id: res.user.uid,
           orders: [],
+          trading:[],
           balance: 0,
         });
         toast.success("Successfully Logged in");
@@ -48,6 +49,7 @@ export default function SignUp(){
         password:"",
         id: res.user.uid,
         orders: [],
+        trading:[],
         balance: 0,
       });
       toast.success("Successfully Logged in");

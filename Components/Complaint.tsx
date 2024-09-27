@@ -41,6 +41,7 @@ const Report: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [imageData,setimageData]=useState("");
   const [email,setemail]=useState("");
+  
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {

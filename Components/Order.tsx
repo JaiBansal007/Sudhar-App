@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { db ,auth} from "@/firebase/config";
-import { collection, query, where, getDocs, updateDoc, doc, getDoc } from "firebase/firestore"; // Firestore functions
+import { collection, query, where, getDocs, updateDoc, doc, getDoc, arrayUnion } from "firebase/firestore"; // Firestore functions
 import { toast, Toaster } from "react-hot-toast"; // For toaster message
 import {useRouter} from 'next/navigation';
 import { onAuthStateChanged } from "firebase/auth";
-import { set } from "firebase/database";
+import { set, update } from "firebase/database";
 import Loading from "./Loading";
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
@@ -43,6 +43,7 @@ const Orders: React.FC = () => {
   // Handle Accept or Reject Offer
   const handleResponse = async (orderId: string, status: "accepted" | "rejected") => {
     try {
+      
       const updatedtrading:any=orders.map((order) =>{
         if(order.id===orderId){
           return {...order,status};
@@ -51,9 +52,21 @@ const Orders: React.FC = () => {
       });
       setOrders(updatedtrading);
       const orderRef = doc(db, "users", userid);
-      await updateDoc(orderRef, {
-        trading: updatedtrading,
-      });
+      if(status==="accepted"){
+        await updateDoc(orderRef, {
+          trading: updatedtrading,
+        });
+        const dealerref=doc(db,"dealers",updatedtrading[0].dealerid);
+        const dealerdoc=await getDoc(dealerref);
+        await updateDoc(dealerref,{
+          trading:arrayUnion(updatedtrading[0])
+        });
+      }else{
+        await updateDoc(orderRef, {
+          trading: updatedtrading,
+          dealerid: "",
+        });
+      }
       console.log("Order updated successfully!");
       toast.success(`Offer ${status === "accepted" ? "accepted" : "rejected"} successfully!`);
     } catch (error) {
