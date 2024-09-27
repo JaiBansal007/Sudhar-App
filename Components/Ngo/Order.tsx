@@ -79,7 +79,7 @@ const PastOrders: React.FC = () => {
         {orders.length === 0 ? (
           <p className="text-center">No paid orders available.</p>
         ) : (
-          orders.map((order) => (
+          orders.map((order) =>(
             <div key={order.id} className="p-4 bg-gray-50 rounded-lg shadow">
               <h3 className="text-xl font-bold mb-2">{order.title}</h3>
               <p className="text-gray-600">Description: {order.description}</p>

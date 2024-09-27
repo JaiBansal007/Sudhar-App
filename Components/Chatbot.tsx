@@ -150,10 +150,10 @@ export default function Chatbot() {
         const { balance, transactions } = await fetchWalletDetails(userId);
         
         const walletMessage =
-          `Available Coins: ${balance}\n\n` +
+          `Available Coins: ${balance}\n\n\n` +
           `Latest Transactions:\n` +
-          transactions.map((t: any) => `${t.time.substring(0, 10)} - ${t.voucherName}: ${t.voucherPrice}`).join('\n');
-      
+          transactions.map((t: any) => `${t.time.substring(0, 10)} - ${t.voucherName}: ${t.voucherPrice}`).join('\n\n\n');
+
         addMessage(walletMessage, 'incoming');
       } else if (suggestion === 'Contact Us') {
         router.push('/contact');

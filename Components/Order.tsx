@@ -122,7 +122,8 @@ const Orders: React.FC = () => {
                 <p className="text-green-500 font-semibold">Offer Accepted</p>
               ) : order.status === "rejected" ? (
                 <p className="text-red-500 font-semibold">Offer Rejected</p>
-              ) : null}
+              ) : order.status === "payment_done" ? (
+                <p className="text-green-500 font-semibold">Payment Done</p>):null}
             </div>
           ))
         )}
