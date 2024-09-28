@@ -179,14 +179,14 @@ const Buy: React.FC = () => {
             toast.success("Payment successful!");
             
           }).then(()=>{
-            router.push("/ngo/wallet");
+            router.push("/ngo/order");
         });
         }
         setShowPaymentPopup(false);
         fetchPosts();
       }
 
-    }else{
+    }else{``
       toast.error("Insufficient balance for payment!");
     }
   };
