@@ -13,7 +13,7 @@ const OffersPage: React.FC = () => {
   // Sample offers data with deadlines
   const initialOffers = [
     { name: "50% Off on Electronics", price: 5000, deadline: "2024-09-30" },
-    { name: "Buy 1 Get 1 Free on Apparel", price: 299, deadline: "2024-10-01" },
+    { name: "Buy 1 Get 1 Free on Apparel", price: 300, deadline: "2024-10-01" },
     { name: "₹200 Cashback on Orders Above ₹1000", price: 200, deadline: "2024-09-30" },
     { name: "Free Shipping on Orders Above ₹500", price: 0, deadline: "2024-09-29" },
   ];
