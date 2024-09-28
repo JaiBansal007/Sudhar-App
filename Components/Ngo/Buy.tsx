@@ -159,7 +159,7 @@ const Buy: React.FC = () => {
             time: new Date().toISOString(),
           }),
           trading: updatedTrading, // Use the modified trading array
-          balance: increment(selectedOrder.price * 0.9),
+          balance: increment(selectedOrder.price * 0.95),
         });
         const dealerRef = doc(db, "dealers", dealerid);
         const dealerSnap = await getDoc(dealerRef);

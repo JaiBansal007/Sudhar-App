@@ -143,7 +143,7 @@ const fetchPosts = async () => {
               <p className="text-gray-600 mt-2">Description: {complaint.description}</p>
               <p className="text-gray-600 mt-2">Location: {complaint.location}</p>
               <p className="text-gray-600 mt-1">User: {complaint.user}</p>
-              <p className="text-gray-600 mt-1">Posted At: {complaint.createdAt.substring(0, 10)}</p>
+              <p className="text-gray-600 mt-1">Posted At: {complaint.createdAt?complaint.createdAt.substring(0,10):<></>}</p>
 
               <div className="w-full mt-4 text-center">
                 {complaint.status === "active" ? (
