@@ -155,7 +155,7 @@ const Buy: React.FC = () => {
         await updateDoc(userRef, {
           orders: arrayUnion({
             voucherName: selectedOrder.description,
-            voucherPrice: selectedOrder.price*0.9,
+            voucherPrice: selectedOrder.price*0.95,
             time: new Date().toISOString(),
           }),
           trading: updatedTrading, // Use the modified trading array
