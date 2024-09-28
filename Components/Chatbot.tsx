@@ -261,7 +261,7 @@ export default function Chatbot() {
               </li>
             ))}
           </ul>
-          <div className="flex p-4">
+          <div className="flex p-4 justify-center gap-2">
             <input
               type="text"
               ref={chatInputRef}
@@ -272,7 +272,7 @@ export default function Chatbot() {
             />
             <button
               onClick={handleSendMessage}
-              className="bg-blue-600 text-white rounded-lg px-4 ml-2"
+              className="bg-blue-600 text-white rounded-lg px-3"
             >
               Send
             </button>
