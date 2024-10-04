@@ -13,6 +13,8 @@ interface Complaint {
   title: string;
   description: string;
   location: string;
+  lat:number,
+  lng:number,
   status: "active" | "resolved";
   createdAt: string; // Date string
   user: string;
@@ -45,6 +47,8 @@ const fetchPosts = async () => {
             userID: user.id,
             user: user.email,
             imageurl: post.imageurl,
+            lat: post.lat,
+            lng: post.lng
           }));
         }
         return [];
