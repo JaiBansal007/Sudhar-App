@@ -85,21 +85,20 @@ const startCamera = () => {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       const videoDevices = devices.filter((device) => device.kind === "videoinput");
- 
       // Fallback to the first available camera if no back camera is found
       const backCameraDevice = videoDevices.find((device) => 
         device.label.toLowerCase().includes("back")
       ) || videoDevices[0]; // Fallback to the first available camera
- 
       if (backCameraDevice) {
         navigator.mediaDevices
           .getUserMedia({ video: { deviceId: backCameraDevice.deviceId } })
+        
           .then((stream) => {
-            setCameraOn(true);
             if (videoRef.current) {
               videoRef.current.srcObject = stream;
               videoRef.current.play();
             }
+            setCameraOn(true);
           })
           .catch(() => setError("Unable to access the camera."));
       } else {
@@ -110,18 +109,6 @@ const startCamera = () => {
     setError("Camera access is not supported by your browser.");
   }
 };
-
-
-  if(open){
-    startCamera();
-  }
-
-  // useEffect(() => {
-  //   if(open){
-  //     return startCamera();
-  //   }
-    
-  // }, [open]); // Start camera only when the "open" state is true
 
   const captureImage = (e:any) => {
     e.preventDefault();
@@ -168,6 +155,15 @@ const startCamera = () => {
       setError("Error fetching the address.");
     }
   };
+  const turnOffCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+      setCameraOn(false);
+      console.log("Camera turned off");
+    }
+  };
 
   const validateImages = async () => {
     if (!model || imagePreviews.length < 2) {
@@ -178,15 +174,13 @@ const startCamera = () => {
     setLoading(true);
     setError("");
     setResults([]);
-
     try {
       const imageSize = 224;
       let allowedImageAccuracy = 0;
-
+      const save=videoRef.current;
       for (let imagePreview of imagePreviews) {
         const imgElement = new Image();
         imgElement.src = imagePreview;
-
         await new Promise<void>((resolve) => {
           imgElement.onload = async () => {
             const canvas = document.createElement('canvas');
@@ -216,10 +210,10 @@ const startCamera = () => {
           };
         });
       }
-
+      videoRef.current=save;
       const combinedAccuracy = allowedImageAccuracy / imagePreviews.length;
-
       if (combinedAccuracy > 50) {
+        turnOffCamera();        
         setResults([{ text: "Allowed Image", color: "text-green-500" }]);
         setFormValid(true);
       } else {
@@ -350,13 +344,15 @@ const startCamera = () => {
             <button
               type="button"
               onClick={() => {
-                setOpen(true);
+                setCameraOn(true);
+                startCamera();
               }}
               className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold focus:ring-2 focus:ring-blue-600"
             >
               Start Camera
             </button>
           )}
+
 
 {imagePreviews.length > 0 && (
   <div className="space-y-2">
