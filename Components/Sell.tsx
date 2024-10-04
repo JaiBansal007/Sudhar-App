@@ -39,25 +39,21 @@ const Sell: React.FC = () => {
   const [state, setState] = useState("");
   const [district, setDistrict] = useState("");
   const [address, setAddress] = useState("");
-  const [image, setImage] = useState(null);
-  const [image2, setImage2] = useState(null);
+  const [image, setImage] = useState<any[]>([]);
   const [imagePreview, setImagePreview] = useState<string|null>(null); // State to hold image preview URL
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   // Restrict to image file types and show image preview
   const handleImageUpload = (e:any) => {
     const file = e.target.files[0];
-    if (image==null) {
-      setImage(file);
+      setImage((prev)=>[...prev,file]);
       setImagePreview(URL.createObjectURL(file)); // Create a preview URL for the selected image
-    }else{
-      setImage2(e.target.files[0]);
-    }
     setImages((prev) => [...prev, file]);
   };
 
   // Handle image deletion
   const handleDeleteImage = (index: number) => {
+    setImage((prev) => prev.filter((_, i) => i !== index));
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -107,29 +103,32 @@ const Sell: React.FC = () => {
     
     try {
       setLoading(true);
-      const img1=await Upload(image);
-
-      const img2=await Upload(image2);
+      const uploadedImages = await Promise.all(
+        images.map(async (img: any) => {
+          return await Upload(img); // Assuming Upload returns the image URL after uploading
+        })
+      );
+      console.log(uploadedImages);
       const orderData = {
-        id:Math.random().toString(36),
+        id: Math.random().toString(36),
         title,
         description,
         quantity,
-        images:{img1,img2}, // In a real app, you'll upload these to a storage service like Firebase Storage
-        status: "pending", // initial status
+        images: uploadedImages, // Uploaded image URLs
+        status: "pending", // Initial status
         createdAt: new Date(),
         state,
         district,
         address,
-        price:0
+        price: 0
       };
-
+      console.log(orderData);
       // Add the order to Firestore
       const user=doc(db,"users",userId);
        const usersnap=await getDoc(user);
         if(usersnap.exists()){
           updateDoc(user,{
-            trading:arrayUnion(orderData)
+            trading:arrayUnion({...orderData})
           });
         };
       setLoading(false);

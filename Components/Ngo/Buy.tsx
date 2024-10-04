@@ -222,8 +222,11 @@ const Buy: React.FC = () => {
 
               {/* Display Order Images */}
               <div className="flex space-x-2 mt-4">
-                <img key={1} src={order.images.img1} alt={`Preview ${1}`} className="w-32 h-32 object-cover rounded-lg" />
-                <img key={2} src={order.images.img2} alt={`Preview ${2}`} className="w-32 h-32 object-cover rounded-lg" />
+                {order.images.map((image: string, index: number) => (
+                 <>
+                  <img key={index} src={image} alt="Order" className="w-24 h-24 object-cover rounded-lg" />
+                  </>
+                ))}
               </div>
 
               {/* Offer Submission Section */}

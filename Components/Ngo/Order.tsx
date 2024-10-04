@@ -13,6 +13,7 @@ const PastOrders: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [userid, setUserid] = useState<string>("");
+  
   const fetchPaidOrders = async (props:any) => {
     try {
         const dealerdoc=await getDoc(doc(db,"dealers",props ));
@@ -36,7 +37,6 @@ const PastOrders: React.FC = () => {
       }else{
         setUserid(user.uid);
         fetchPaidOrders(user.uid);
-
       }
     });
     setLoading(true);

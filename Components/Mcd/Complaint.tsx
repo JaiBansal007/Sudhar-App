@@ -145,11 +145,14 @@ const ReceivedComplaints: React.FC = () => {
       className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col sm:flex-row items-start sm:items-center p-4 sm:p-6"
     >
       <div className="w-full sm:w-1/3">
-        <img
-          src={complaint.imageurl}
+        {complaint.imageurl.map((url: string, index: number) => (
+          <img
+          key={index}
+          src={url}
           alt={complaint.title}
           className="w-full h-40 object-cover rounded-lg"
         />
+        ))}
       </div>
 
       <div className="w-full sm:w-2/3 sm:pl-6 mt-4 sm:mt-0">

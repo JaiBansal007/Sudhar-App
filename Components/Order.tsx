@@ -95,18 +95,14 @@ const Orders: React.FC = () => {
               {/* <p>{order.images[0]}</p> */}
 
               <div className="flex space-x-2 mt-4">
-              <img
-                    key={1}
-                    src={order.images.img1} // Replace this with the correct image handling logic if needed
-                    alt={`Preview ${1}`}
-                    className="w-32 h-32 object-cover rounded-lg"
-                  />
+                {order.images.map((image: string, index: number) => (
                   <img
-                    key={2}
-                    src={order.images.img2} // Replace this with the correct image handling logic if needed
-                    alt={`Preview ${2}`}
-                    className="w-32 h-32 object-cover rounded-lg"
+                    key={index}
+                    src={image}
+                    alt={order.title}
+                    className="w-20 h-20 object-cover rounded-lg"
                   />
+                ))}
               </div>
 
               {order.status === "pending" ? (

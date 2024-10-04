@@ -9,6 +9,7 @@ import { auth, db } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import emailjs from 'emailjs-com';
 import Loading from './Loading';
+import uploadFile from '@/firebase/upload';
 interface PredictionResult {
   text: string;
   color: string;
@@ -39,7 +40,7 @@ const Report: React.FC = () => {
   const [userID,setuserID]=useState("");
   const URL = "./my_model/";
   const [open, setOpen] = useState(false);
-  const [imageData,setimageData]=useState("");
+  const [imageData,setimageData]=useState<any[]>([]);
   const [email,setemail]=useState("");
   
   useEffect(() => {
@@ -78,37 +79,36 @@ const Report: React.FC = () => {
 
   const removeImage = (index: number) => {
   setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-};
+  };
 
-
-const startCamera = () => {
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.enumerateDevices().then((devices) => {
-      const videoDevices = devices.filter((device) => device.kind === "videoinput");
-      // Fallback to the first available camera if no back camera is found
-      const backCameraDevice = videoDevices.find((device) => 
-        device.label.toLowerCase().includes("back")
-      ) || videoDevices[0]; // Fallback to the first available camera
-      if (backCameraDevice) {
-        navigator.mediaDevices
-          .getUserMedia({ video: { deviceId: backCameraDevice.deviceId } })
-        
-          .then((stream) => {
-            if (videoRef.current) {
-              videoRef.current.srcObject = stream;
-              videoRef.current.play();
-            }
-            setCameraOn(true);
-          })
-          .catch(() => setError("Unable to access the camera."));
-      } else {
-        setError("No camera device found.");
-      }
-    });
-  } else {
-    setError("Camera access is not supported by your browser.");
-  }
-};
+  const startCamera = () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        const videoDevices = devices.filter((device) => device.kind === "videoinput");
+        // Fallback to the first available camera if no back camera is found
+        const backCameraDevice = videoDevices.find((device) => 
+          device.label.toLowerCase().includes("back")
+        ) || videoDevices[0]; // Fallback to the first available camera
+        if (backCameraDevice) {
+          navigator.mediaDevices
+            .getUserMedia({ video: { deviceId: backCameraDevice.deviceId } })
+          
+            .then((stream) => {
+              if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+                videoRef.current.play();
+              }
+              setCameraOn(true);
+            })
+            .catch(() => setError("Unable to access the camera."));
+        } else {
+          setError("No camera device found.");
+        }
+      });
+    } else {
+      setError("Camera access is not supported by your browser.");
+    }
+  };
 
   const captureImage = (e:any) => {
     e.preventDefault();
@@ -116,12 +116,10 @@ const startCamera = () => {
       const context = canvasRef.current.getContext('2d');
       if (context) {
         context.drawImage(videoRef.current, 0, 0, 224, 224);
-        const imageData = canvasRef.current.toDataURL('image/png');
+        const imageData = canvasRef.current.toDataURL(`image/png/${Math.random()*100000}`);
         setImagePreviews((prev) => [...prev, imageData]);
         imagePreviews.forEach((src, index) => {
-          if (index < 2) {
-            setimageData(src);
-          }
+            setimageData((prev) => [...prev,src]);
         });
         setResults([]);
         if (navigator.geolocation) {
@@ -217,6 +215,7 @@ const startCamera = () => {
         setResults([{ text: "Allowed Image", color: "text-green-500" }]);
         setFormValid(true);
       } else {
+        startCamera();
         setResults([{ text: "Invalid Image", color: "text-red-500" }]);
         setFormValid(false);
       }
@@ -238,23 +237,23 @@ const startCamera = () => {
         }
       });
       const user=doc(db,"users",userID);
-    const usersnap=await getDoc(user);
-    if(usersnap.exists()){
-      updateDoc(user,{
-        complaint:arrayUnion({
-          id:Math.random().toString(36),
-          time:new Date().toISOString(),
-          title:title,
-          description:description, 
-          location:address,
-          status:"active",
-          imageurl:imageData,
-          lat:location?.lat,
-          lng:location?.lng
-        })
-      });
-      }
-  
+      const usersnap=await getDoc(user);
+      if(usersnap.exists()){
+        updateDoc(user,{
+          complaint:arrayUnion({
+            id:Math.random().toString(36),
+            time:new Date().toISOString(),
+            title:title,
+            description:description, 
+            location:address,
+            status:"active",
+            imageurl:imageData,
+            lat:location?.lat,
+            lng:location?.lng
+          })
+        });
+        }
+    
       const somedata = await getDoc(doc(db, "users", userID));
       if (somedata.exists()) {
         const currentbalance = Number(Number(somedata.data().balance) + 100);
@@ -297,6 +296,7 @@ const startCamera = () => {
     }
     setLoading(false);
   };
+
   if(loading){
     return <Loading/>
   }
