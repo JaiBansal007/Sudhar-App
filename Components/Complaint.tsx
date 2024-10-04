@@ -217,6 +217,7 @@ const startCamera = () => {
         setResults([{ text: "Allowed Image", color: "text-green-500" }]);
         setFormValid(true);
       } else {
+        startCamera();
         setResults([{ text: "Invalid Image", color: "text-red-500" }]);
         setFormValid(false);
       }
