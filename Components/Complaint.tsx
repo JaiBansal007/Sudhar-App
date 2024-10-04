@@ -254,7 +254,9 @@ const startCamera = () => {
           description:description, 
           location:address,
           status:"active",
-          imageurl:imageData
+          imageurl:imageData,
+          lat:location?.lat,
+          lng:location?.lng
         })
       });
       }
