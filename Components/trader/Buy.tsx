@@ -127,7 +127,7 @@ const Buy: React.FC = () => {
   };
  
   const handleMakePayment = (order: any) => {
-    if(order.price > walletBalance) {
+    if(order.price*1.05 > walletBalance) {
       toast.error("Insufficient balance for payment!");
       return;
     }
@@ -169,14 +169,14 @@ const Buy: React.FC = () => {
           await updateDoc(dealerRef, {
             orders: arrayUnion({
               voucherName: selectedOrder.description,
-              voucherPrice: -selectedOrder.price,
+              voucherPrice: -selectedOrder.price*1.05,
               time: new Date().toISOString(),
             }),
             trading: arrayUnion({
               ...selectedOrder,
               status: "payment_done",
             }),
-            balance: increment(-selectedOrder.price),
+            balance: increment(-selectedOrder.price*(1.05)),
           }).then(() => {
             toast.success("Payment successful!");
             router.push("/trader/order");
@@ -322,9 +322,9 @@ const Buy: React.FC = () => {
           <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-80 max-w-full">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Make Payment</h4>
-              <p className="text-gray-700 mb-2"><strong>Order Amount:</strong> ₹{selectedOrder.price}</p>
+              <p className="text-gray-700 mb-2"><strong>Order Amount:</strong> ₹{selectedOrder.price*1.05}</p>
               <p className="text-gray-700 mb-2"><strong>Your Wallet Balance:</strong> ₹{walletBalance}</p>
-              <p className="text-gray-700 mb-4"><strong>Final Balance After Payment:</strong> ₹{walletBalance - selectedOrder.price}</p>
+              <p className="text-gray-700 mb-4"><strong>Final Balance After Payment:</strong> ₹{walletBalance - selectedOrder.price*1.05}</p>
               <button
                 type="button"
                 onClick={handlePaymentSubmit}

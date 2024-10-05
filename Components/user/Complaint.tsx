@@ -39,7 +39,6 @@ const Report: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [userID,setuserID]=useState("");
   const URL = "../my_model/";
-  const [open, setOpen] = useState(false);
   const [imageData,setimageData]=useState<any[]>([]);
   const [email,setemail]=useState("");
 
@@ -87,7 +86,7 @@ const Report: React.FC = () => {
         const videoDevices = devices.filter((device) => device.kind === "videoinput");
         // Fallback to the first available camera if no back camera is found
         const backCameraDevice = videoDevices.find((device) => 
-          device.label.toLowerCase().includes("back")
+          device.label.toLowerCase().includes("front")
         ) || videoDevices[0]; // Fallback to the first available camera
         if (backCameraDevice) {
           navigator.mediaDevices
@@ -168,7 +167,6 @@ const Report: React.FC = () => {
       setError("Please capture at least two images.");
       return;
     }
-
     setLoading(true);
     setError("");
     setResults([]);
