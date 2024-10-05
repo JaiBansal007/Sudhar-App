@@ -151,7 +151,7 @@ const Sell: React.FC = () => {
           setUserId(user.uid);
         } else {
           // Redirect to login page if user is not logged in
-          router.push("/signin");
+          router.push("/user/signin");
         }
       });
       
