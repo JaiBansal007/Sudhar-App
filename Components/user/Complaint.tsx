@@ -197,7 +197,7 @@ const Report: React.FC = () => {
                 }
               }
 
-              if (predictedClass === "Garbage" || predictedClass === "Damaged Roads") {
+              if (predictedClass === "Garbage" || predictedClass === "Damaged Road") {
                 allowedImageAccuracy += highestProbability * 100;
               }
             }
