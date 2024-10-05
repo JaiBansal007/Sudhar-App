@@ -1,5 +1,5 @@
 import Navbar from "@/Components/admin/Navbar";
-import Footer from "@/Components/Footer";
+import Footer from "@/Components/user/Footer";
 import Profile from "@/Components/admin/Profile";
 export default function Home(){
   return (

@@ -1,4 +1,4 @@
-import Loading from "@/Components/Loading";
+import Loading from "@/Components/utilities/Loading";
 
 
 export default function hello() {

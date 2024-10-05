@@ -247,7 +247,7 @@ const ReceivedComplaints: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="hidden sm:block flex sm:items-center mt-4 text-center space-y-2 sm:space-y-0 sm:space-x-4">
+                <div className="hidden sm:block sm:items-center mt-4 text-center space-y-2 sm:space-y-0 sm:space-x-4">
                   <button className="bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-800">
                     <span className="material-icons">Block User</span>
                   </button>

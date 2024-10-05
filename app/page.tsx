@@ -1,9 +1,9 @@
 "use client";
  
 import React, { useEffect, useState } from 'react';
-import Navbar from '@/Components/Navbar'; // Import Navbar
-import Footer from '@/Components/Footer'; // Import Footer
-import Chatbot from '@/Components/Chatbot'; // Import Chatbot
+import Navbar from '@/Components/user/Navbar'; // Import Navbar
+import Footer from '@/Components/user/Footer'; // Import Footer
+import Chatbot from '@/Components/user/Chatbot'; // Import Chatbot
 import app, { auth, db } from "@/firebase/config"; // Import Firebase config
 import { collection, getDocs, getFirestore } from 'firebase/firestore'; // Import Firestore
 import { useRouter } from "next/navigation"; // Import Next.js router
