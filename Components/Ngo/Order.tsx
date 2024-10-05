@@ -87,7 +87,7 @@ const PastOrders: React.FC = () => {
                 <p className="text-gray-600 text-sm sm:text-base"><strong>Posted On:</strong> {order.createdAt.toDate().toDateString()}</p>
                 <p className="text-gray-600 text-sm sm:text-base"><strong>User State:</strong> {order.state}</p>
                 <p className="text-gray-600 text-sm sm:text-base"><strong>User District:</strong> {order.district}</p>
-                <p className="text-gray-600 text-lg sm:text-base"><strong>Detailed Address:</strong> {order.useraddress}</p>
+                <p className="text-gray-600 mt-4 text-xl "><strong>Detailed Address:</strong> {order.useraddress}</p>
               </div>
  
               {/* Display Order Images */}
