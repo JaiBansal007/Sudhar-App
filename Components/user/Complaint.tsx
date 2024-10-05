@@ -86,7 +86,7 @@ const Report: React.FC = () => {
         const videoDevices = devices.filter((device) => device.kind === "videoinput");
         // Fallback to the first available camera if no back camera is found
         const backCameraDevice = videoDevices.find((device) => 
-          device.label.toLowerCase().includes("front")
+          device.label.toLowerCase().includes("back")
         ) || videoDevices[0]; // Fallback to the first available camera
         if (backCameraDevice) {
           navigator.mediaDevices
@@ -197,7 +197,7 @@ const Report: React.FC = () => {
                 }
               }
 
-              if (predictedClass === "Garbage") {
+              if (predictedClass === "Garbage" || predictedClass === "Damaged Road") {
                 allowedImageAccuracy += highestProbability * 100;
               }
             }
@@ -208,7 +208,7 @@ const Report: React.FC = () => {
       }
       videoRef.current=save;
       const combinedAccuracy = allowedImageAccuracy / imagePreviews.length;
-      if (combinedAccuracy > 90) {
+      if (combinedAccuracy > 50) {
         turnOffCamera();        
         setResults([{ text: "Allowed Image", color: "text-green-500" }]);
         setFormValid(true);
