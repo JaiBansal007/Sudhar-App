@@ -139,7 +139,7 @@ const HeroSection: React.FC = () => {
         <p className="text-xl text-white mb-6">Make your city a better place with smart garbage detection technology.</p>
         <button
           className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105"
-          onClick={() => window.location.href = '/ngo/buy'}
+          onClick={() => window.location.href = '/trader/buy'}
         >
           Buy Scrap
         </button>
