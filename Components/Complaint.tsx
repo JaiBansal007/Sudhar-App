@@ -199,7 +199,7 @@ const Report: React.FC = () => {
                 }
               }
 
-              if (predictedClass === "Garbage" || predictedClass === "Damaged Road") {
+              if (predictedClass === "Garbage") {
                 allowedImageAccuracy += highestProbability * 100;
               }
             }
@@ -210,7 +210,7 @@ const Report: React.FC = () => {
       }
       videoRef.current=save;
       const combinedAccuracy = allowedImageAccuracy / imagePreviews.length;
-      if (combinedAccuracy > 50) {
+      if (combinedAccuracy > 90) {
         turnOffCamera();        
         setResults([{ text: "Allowed Image", color: "text-green-500" }]);
         setFormValid(true);

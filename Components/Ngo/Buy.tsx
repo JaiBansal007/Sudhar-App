@@ -58,6 +58,7 @@ const Buy: React.FC = () => {
       };
  
       const combinedPostsArray = formatUserPosts(userRecord);
+      console.log("Combined posts:", combinedPostsArray);
       setOrders(combinedPostsArray);
       setLoading(false);
     } catch (error) {
