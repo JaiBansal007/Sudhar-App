@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import emailjs from "emailjs-com";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CancelIcon from '@mui/icons-material/Cancel';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const firestore = getFirestore(app);
 
@@ -27,6 +29,8 @@ interface Complaint {
 const ReceivedComplaints: React.FC = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null); // To store the complaint for map display
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0); // To keep track of the selected image index
+  const [isImageModalOpen, setIsImageModalOpen] = useState<boolean>(false); // To handle image modal visibility
   const router = useRouter();
 
   const fetchPosts = async () => {
@@ -54,7 +58,6 @@ const ReceivedComplaints: React.FC = () => {
               userID: user.id,
               user: user.email,
               imageurl: post.imageurl,
-
             }));
           }
           return [];
@@ -128,6 +131,29 @@ const ReceivedComplaints: React.FC = () => {
     setSelectedComplaint(null); // Close the modal
   };
 
+  const openImageModal = (complaint: Complaint, index: number) => {
+    setSelectedComplaint(complaint);
+    setSelectedImageIndex(index);
+    setIsImageModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+    setSelectedComplaint(null);
+    console.log("Image modal closed.");
+  };
+
+  const handleImageNavigation = (direction: "left" | "right") => {
+    if (selectedComplaint) {
+      const totalImages = selectedComplaint.imageurl.length;
+      if (direction === "left") {
+        setSelectedImageIndex((prevIndex) => (prevIndex - 1 + totalImages) % totalImages);
+      } else {
+        setSelectedImageIndex((prevIndex) => (prevIndex + 1) % totalImages);
+      }
+    }
+  };
+
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -142,114 +168,120 @@ const ReceivedComplaints: React.FC = () => {
       <h1 className="text-4xl font-bold text-gray-900 mb-8">Received Complaints</h1>
 
       <div className="w-full max-w-3xl space-y-6">
-  {complaints.map((complaint: any) => (
-    <div
-      key={complaint.id}
-      className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col sm:flex-row items-start sm:items-center p-4 sm:p-6"
-    >
-      <div className="w-full sm:w-1/3">
-      {complaint.imageurl && complaint.imageurl.length > 0 ? (
-          complaint.imageurl.map((url: string, index: number) => (
-            <img
-              key={index}
-              src={url}
-              alt={complaint.title}
-              className="w-full h-40 object-cover rounded-lg"
-            />
-          ))
-        ) : (
-          <p>No images to display</p>
-        )}
+        {complaints.map((complaint) => (
+          <div
+            key={complaint.id}
+            className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col sm:flex-row items-start sm:items-center p-4 sm:p-6"
+          >
+            <div className="w-full sm:w-1/3 relative">
+              {complaint.imageurl && complaint.imageurl.length > 0 ? (
+                <>
+                  <img
+                    src={complaint.imageurl[selectedImageIndex]}
+                    alt={complaint.title}
+                    className="w-full h-40 object-cover rounded-lg"
+                    onClick={() => openImageModal(complaint, 0)}
+                  />
+                  {complaint.imageurl.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => setSelectedImageIndex((prevIndex) => (prevIndex - 1 + complaint.imageurl.length) % complaint.imageurl.length)}
+                        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full"
+                      >
+                        <ArrowBackIosIcon />
+                      </button>
+                      <button
+                        onClick={() => setSelectedImageIndex((prevIndex) => (prevIndex + 1) % complaint.imageurl.length)}
+                        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full"
+                      >
+                        <ArrowForwardIosIcon />
+                      </button>
+                    </>
+                  )}
+                </>
+              ) : (
+                <p>No images to display</p>
+              )}
+            </div>
 
+            <div className="w-full sm:w-2/3 sm:pl-6 mt-4 sm:mt-0">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">{complaint.title}</h2>
+              <p className="text-gray-600 mt-2">Description: {complaint.description}</p>
+              <p className="text-gray-600 mt-2">Location: {complaint.location}</p>
+              <p className="text-gray-600 mt-1">User: {complaint.user}</p>
+              <p className="text-gray-600 mt-1">Posted At: {complaint.createdAt ? complaint.createdAt.substring(0, 10) : <></>}</p>
+
+              <div className="flex justify-between flex-col sm:flex-row">
+                <div className="flex flex-col sm:flex-row sm:items-center mt-4 text-center space-y-2 sm:space-y-0 sm:space-x-4">
+                  {complaint.status === "active" ? (
+                    <button
+                      onClick={() =>
+                        markAsCompleted({
+                          userid: complaint.userID,
+                          complaintid: complaint.id,
+                        })
+                      }
+                      className="bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-600 focus:ring-2 focus:ring-blue-500"
+                    >
+                      Pending
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() =>
+                        markAsCompleted({
+                          userid: complaint.userID,
+                          complaintid: complaint.id,
+                        })
+                      }
+                      className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md"
+                    >
+                      Resolved
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => openMapModal(complaint)}
+                    className="hidden sm:block bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300"
+                  >
+                    <LocationOnIcon className="text-blue-800" />
+                  </button>
+                </div>
+
+                <div className="hidden sm:block flex sm:items-center mt-4 text-center space-y-2 sm:space-y-0 sm:space-x-4">
+                  <button className="bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-800">
+                    <span className="material-icons">Block User</span>
+                  </button>
+                </div>
+
+                <div className="flex gap-2 sm:hidden mt-2 space-x-0">
+                  <button
+                    onClick={() => openMapModal(complaint)}
+                    className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300"
+                  >
+                    <LocationOnIcon className="text-blue-800" />
+                  </button>
+                  <button className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-800">
+                    <span className="material-icons">Block User</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
-
-      <div className="w-full sm:w-2/3 sm:pl-6 mt-4 sm:mt-0">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900">{complaint.title}</h2>
-        <p className="text-gray-600 mt-2">Description: {complaint.description}</p>
-        <p className="text-gray-600 mt-2">Location: {complaint.location}</p>
-        <p className="text-gray-600 mt-1">User: {complaint.user}</p>
-        <p className="text-gray-600 mt-1">Posted At: {complaint.createdAt ? complaint.createdAt.substring(0, 10) : <></>}</p>
-
-        <div className="flex justify-between flex-col sm:flex-row">
-  <div className="flex flex-col sm:flex-row sm:items-center mt-4 text-center space-y-2 sm:space-y-0 sm:space-x-4">
-    {complaint.status === "active" ? (
-      <button
-        onClick={() =>
-          markAsCompleted({
-            userid: complaint.userID,
-            complaintid: complaint.id,
-          })
-        }
-        className="bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-600 focus:ring-2 focus:ring-blue-500"
-      >
-        Pending
-      </button>
-    ) : (
-      <button
-        onClick={() =>
-          markAsCompleted({
-            userid: complaint.userID,
-            complaintid: complaint.id,
-          })
-        }
-        className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md"
-      >
-        Resolved
-      </button>
-    )}
-
-    {/* Maps Button for medium/large screens */}
-    <button
-      onClick={() => openMapModal(complaint)}
-      className="hidden sm:block bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300"
-    >
-      <span className="material-icons">
-        <LocationOnIcon className="text-blue-800" />
-      </span>
-    </button>
-  </div>
-
-  {/* Block User Button for medium/large screens */}
-  <div className="hidden sm:block flex sm:items-center mt-4 text-center space-y-2 sm:space-y-0 sm:space-x-4">
-    <button className="bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-800">
-      <span className="material-icons">Block User</span>
-    </button>
-  </div>
-
-  {/* Layout for small screens */}
-  <div className="flex gap-2 sm:hidden mt-2 space-x-0">
-    <button
-      onClick={() => openMapModal(complaint)}
-      className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300"
-    >
-      <span className="material-icons">
-        <LocationOnIcon className="text-blue-800" />
-      </span>
-    </button>
-    <button className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-800">
-      <span className="material-icons">Block User</span>
-    </button>
-  </div>
-</div>
-
-      </div>
-    </div>
-  ))}
-</div>
-
 
       {/* Modal for Map */}
-      {selectedComplaint && (
+      {selectedComplaint && !isImageModalOpen && (
         <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow-lg w-3/4 max-w-3xl p-6 pt-4 relative">
             <button
               onClick={closeMapModal}
               className="absolute top-4 right-6 text-gray-600 hover:text-gray-800"
             >
-              <CancelIcon className = "text-red-600"/>
+              <CancelIcon className="text-red-600" />
             </button>
             <h2 className="text-lg font-semibold md:text-xl mb-4 max-w-[90%]">
-              Location : {selectedComplaint.location}
+              Location: {selectedComplaint.location}
             </h2>
 
             {/* Embedded Google Maps iframe using lat and lng */}
@@ -264,8 +296,47 @@ const ReceivedComplaints: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Modal for Image */}
+      {isImageModalOpen && selectedComplaint && (
+        <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md md:max-w-lg p-4 relative">
+            <button
+              type="button"
+              onClick={closeImageModal}
+              className="w-full text-right text-gray-600 hover:text-gray-800"
+            >
+              <CancelIcon className="text-red-600" />
+            </button>
+            <div className="relative flex items-center">
+              {selectedComplaint.imageurl.length > 1 && (
+                <button
+                  onClick={() => handleImageNavigation("left")}
+                  className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full"
+                >
+                  <ArrowBackIosIcon />
+                </button>
+              )}
+              <img
+                src={selectedComplaint.imageurl[selectedImageIndex]}
+                alt={selectedComplaint.title}
+                className="w-full h-80 object-contain rounded-lg"
+              />
+              {selectedComplaint.imageurl.length > 1 && (
+                <button
+                  onClick={() => handleImageNavigation("right")}
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full"
+                >
+                  <ArrowForwardIosIcon />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default ReceivedComplaints;
+

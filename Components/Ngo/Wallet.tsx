@@ -97,14 +97,7 @@ const Wallet: React.FC = () => {
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Available Coins</h3>
           <div className="flex justify-between items-center">
-            <div className="grid grid-cols-10 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div
-                className="bg-blue-500 text-white flex justify-center p-4 rounded-lg shadow-md cursor-pointer hover:bg-blue-600"
-                onClick={() => handleCoinClick(coin)}
-              >
-                <p className="text-lg font-bold">{coin}</p>
-              </div>
-            </div>
+            <p className="text-lg text-center font-bold bg-blue-500 text-white flex justify-center p-3 rounded-lg shadow-md cursor-pointer hover:bg-blue-600">{coin}</p>
 
             {/* Add Money Button */}
             <div className="ml-4">
