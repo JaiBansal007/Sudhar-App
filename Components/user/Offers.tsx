@@ -27,7 +27,7 @@ const OffersPage: React.FC = () => {
           setwalletBalance(userSnap.data().balance);
         }
       }else{
-        router.push("/signin");
+        router.push("/user/signin");
       }
     });
 
@@ -57,7 +57,7 @@ const OffersPage: React.FC = () => {
           setwalletBalance(userSnap.data().balance);
         }
       }else{
-        router.push("/signin");
+        router.push("/user/signin");
       }
     });
 

@@ -55,7 +55,7 @@ export default function Post() {
             
             
             // Show success message and redirect to the community page
-            router.push("/community");
+            router.push("/user/community");
             toast.success("Post created successfully");
 
         } catch (error) {
@@ -70,7 +70,7 @@ export default function Post() {
           setUserId(user.uid);
         } else {
           // Redirect to login page if user is not logged in
-          router.push("/signin");
+          router.push("/user/signin");
         }
       });
 
