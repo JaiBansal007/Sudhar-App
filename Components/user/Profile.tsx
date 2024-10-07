@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 interface Complaint {
   id: string;
   title: string;
-  photos: string[];
+  imageurl: string[];
   status: "active" | "resolved" | "user_approved";
   createdAt: string; // Date string
   description: string; // Ensure description is included
@@ -23,6 +23,9 @@ const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"all" | "active" | "resolved">("all");
   const [userID, setUserID] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -142,6 +145,31 @@ const Profile: React.FC = () => {
     }
   };
 
+  const openImagePopup = (complaint: Complaint, index: number) => {
+    setSelectedComplaint(complaint);
+    setCurrentIndex(index);
+  };
+  
+  const closeImagePopup = () => {
+    setSelectedComplaint(null);
+    setCurrentIndex(0);
+  };
+  
+  const nextImage = () => {
+    if (selectedComplaint) {
+      const nextIndex = (currentIndex + 1) % selectedComplaint.imageurl.length;
+      setCurrentIndex(nextIndex);
+    }
+  };
+  
+  const prevImage = () => {
+    if (selectedComplaint) {
+      const prevIndex = (currentIndex - 1 + selectedComplaint.imageurl.length) % selectedComplaint.imageurl.length;
+      setCurrentIndex(prevIndex);
+    }
+  };
+  
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center px-4 sm:px-6 lg:px-8">
       <div className="w-full mt-10 max-w-md bg-white p-8 rounded-lg shadow-lg">
@@ -253,13 +281,63 @@ const Profile: React.FC = () => {
                                 )}
                               </p>
                               {/* Complaint Photos */}
-                              {complaint.imageurl.map((image:string, index:number) => (
-                                <img
-                                key={index}
-                                src={image}
-                                alt=""
-                                className="object-contain w-full mt-4 rounded-lg"
-                              />))}
+                              {complaint.imageurl && complaint.imageurl.length > 0 && (
+  <div
+    className="flex space-x-2 mt-4 overflow-x-auto"
+    style={{
+      scrollbarWidth: 'none', // Firefox
+      msOverflowStyle: 'none', // Internet Explorer
+    }}
+  >
+    {complaint.imageurl.map((photo: string, index: number) => (
+      <img
+        key={index}
+        src={photo}
+        alt={`Complaint Photo ${index + 1}`}
+        className="w-32 h-32 object-cover rounded-lg cursor-pointer"
+        onClick={() => openImagePopup(complaint, index)}
+      />
+    ))}
+  </div>
+)}
+
+<style jsx>{`
+  div::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+  }
+`}</style>
+{selectedComplaint && (
+  <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+    <div className="relative bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-md sm:max-w-lg">
+      <img
+        src={selectedComplaint.imageurl[currentIndex]}
+        alt="Selected Complaint"
+        className="w-full h-auto object-cover rounded-lg mb-4"
+      />
+      <div className="flex justify-between items-center">
+        <button
+          onClick={prevImage}
+          className="py-2 px-4 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 focus:outline-none"
+        >
+          Previous
+        </button>
+        <button
+          onClick={closeImagePopup}
+          className="py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none"
+        >
+          Close
+        </button>
+        <button
+          onClick={nextImage}
+          className="py-2 px-4 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 focus:outline-none"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
                               {/* Repost Button for Active Complaints */}
                               {(activeTab === "active"||activeTab=="all") && diffDays > 2 && (

@@ -91,7 +91,11 @@ const PastOrders: React.FC = () => {
               </div>
  
               {/* Display Order Images */}
-              <div className="flex space-x-2 mt-4 overflow-x-auto">
+              <div className="flex space-x-2 mt-4 overflow-x-auto"
+              style={{
+                scrollbarWidth: 'none', // For Firefox
+                msOverflowStyle: 'none', // For Internet Explorer
+              }}>
                 {order.images.map((image: string, index: number) => (
                   <img
                     key={index}
@@ -105,6 +109,11 @@ const PastOrders: React.FC = () => {
                   />
                 ))}
               </div>
+              <style jsx>{`
+  div::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+  }
+`}</style>
  
               {/* Display Order Status */}
               <div className="mt-4 p-4 bg-white rounded-lg shadow-md">
