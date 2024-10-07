@@ -256,7 +256,7 @@ const Buy: React.FC = () => {
                         key={index}
                         src={image}
                         alt="Order"
-                        className="w-20 sm:w-24 h-20 sm:h-24 object-cover rounded-lg cursor-pointer"
+                        className="w-24 sm:w-24 h-24 sm:h-24 object-cover rounded-lg cursor-pointer"
                         onClick={() => {
                           openImagePopup(index);
                           setSelectedOrder(order);
@@ -331,7 +331,9 @@ const Buy: React.FC = () => {
           <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-80 max-w-full">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Make Payment</h4>
-              <p className="text-gray-700 mb-2"><strong>Order Amount:</strong> ₹{selectedOrder.price*1.05}</p>
+              <p className="text-gray-700"><strong>Order Amount:</strong> ₹{selectedOrder.price}</p>
+              <p className="text-gray-700 mb-2">5% Convenience Fee: ₹{selectedOrder.price*0.05}</p>
+              <p className="text-gray-700 mb-2"><strong>Final Order Amount:</strong> ₹{selectedOrder.price*1.05}</p>
               <p className="text-gray-700 mb-2"><strong>Your Wallet Balance:</strong> ₹{walletBalance}</p>
               <p className="text-gray-700 mb-4"><strong>Final Balance After Payment:</strong> ₹{walletBalance - selectedOrder.price*1.05}</p>
               <button
