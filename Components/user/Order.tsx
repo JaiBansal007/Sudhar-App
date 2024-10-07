@@ -118,7 +118,11 @@ const Orders: React.FC = () => {
               <p>Quantity: {order.quantity}</p>
 
               {/* Horizontal scroll for images */}
-              <div className="flex space-x-2 mt-4 overflow-x-auto">
+              <div className="flex space-x-2 mt-4 overflow-x-auto"
+              style={{
+                scrollbarWidth: 'none', // For Firefox
+                msOverflowStyle: 'none', // For Internet Explorer
+              }}>
                 {order.images.map((image: string, index: number) => (
                   <img
                     key={index}
@@ -129,6 +133,11 @@ const Orders: React.FC = () => {
                   />
                 ))}
               </div>
+              <style jsx>{`
+  div::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+  }
+`}</style>
 
               {order.status === "pending" ? (
                 <p className="text-yellow-500 font-semibold">Waiting for Dealer Offer</p>

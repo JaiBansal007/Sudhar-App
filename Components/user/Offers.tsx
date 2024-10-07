@@ -90,7 +90,11 @@ const OffersPage: React.FC = () => {
           <h3 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Available Vouchers</h3>
 
           {/* Scrollable container for vouchers */}
-          <div className="max-h-96 overflow-y-scroll">
+          <div className="max-h-96 overflow-y-scroll"
+          style={{
+            scrollbarWidth: 'none', // For Firefox
+            msOverflowStyle: 'none', // For Internet Explorer
+          }}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 justify-items-center">
               {filteredOffers.slice(0, 4).map((offer, index) => (
                 <div
@@ -119,6 +123,11 @@ const OffersPage: React.FC = () => {
               ))}
             </div>
           </div>
+          <style jsx>{`
+  div::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+  }
+`}</style>
         </div>
       </div>
     </div>
