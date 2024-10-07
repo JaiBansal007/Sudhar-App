@@ -15,7 +15,7 @@ export default function Signin(){
     e.preventDefault();
     try{
       await signInWithEmailAndPassword(auth,email,password);
-      router.push('user/profile');
+      router.push('/user/profile');
     }catch(error){
       try {
         // Fetch all the documents from the "mcd" collection
