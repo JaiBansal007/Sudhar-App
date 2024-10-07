@@ -136,7 +136,7 @@ const Sell: React.FC = () => {
       toast.success("Order submitted successfully!");
 
       // Redirect to the orders page after submission using window.location.href
-      router.push("user/order");
+      router.push("/user/order");
     } catch (error) {
       console.error("Error adding document: ", error);
       toast.error("Error submitting the order");

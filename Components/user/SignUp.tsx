@@ -48,7 +48,7 @@ export default function SignUp(){
           userpost: [],
         });
         toast.success("Successfully Logged in");
-        router.push("user/profile");
+        router.push("/user/profile");
       } catch (error) {
         toast.error("Invalid Credentials");
       }

@@ -123,7 +123,7 @@ export default function Navbar() {
                 </Link>
               </li>
               {/* <li>
-                <Link href="user/coming">
+                <Link href="/user/coming">
                   <button className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
                     Coming Soon
                   </button>

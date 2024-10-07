@@ -26,7 +26,7 @@ export default function Community() {
       if(user){
         setuserId(user.uid);
       }else{
-        router.push("user/signin");
+        router.push("/user/signin");
       }
     })
     const fetchPosts = async () => {

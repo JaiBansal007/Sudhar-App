@@ -231,7 +231,7 @@ const Report: React.FC = () => {
         if (user) {
           setuserID(user.uid);
         } else {
-          router.push("user/signin");
+          router.push("/user/signin");
         }
       });
       const user=doc(db,"users",userID);
