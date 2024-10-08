@@ -250,7 +250,12 @@ const Profile: React.FC = () => {
                 </div>
 
                 {/* Complaints Display */}
-                <div className="bg-white rounded-lg shadow-md">
+                <div className="bg-white rounded-lg shadow-md max-h-96 overflow-y-scroll"
+                style={{
+                  scrollbarWidth: 'none', // For Firefox
+                  msOverflowStyle: 'none', // For Internet Explorer
+                }}>
+                  
                   {loading ? (
                     <p className="text-center text-gray-600">Loading complaints...</p>
                   ) : (
@@ -261,6 +266,7 @@ const Profile: React.FC = () => {
                           (now.getTime() - complaintDate.getTime()) /
                             (1000 * 60 * 60 * 24)
                         );
+                        
                         return (
                           <div key={complaint.id} className="border-t border-gray-200">
                             <div className="p-4">
@@ -280,6 +286,7 @@ const Profile: React.FC = () => {
                                   <span className="text-red-700 text-md">Active</span>
                                 )}
                               </p>
+                              
                               {/* Complaint Photos */}
                               {complaint.imageurl && complaint.imageurl.length > 0 && (
   <div
@@ -294,7 +301,7 @@ const Profile: React.FC = () => {
         key={index}
         src={photo}
         alt={`Complaint Photo ${index + 1}`}
-        className="w-32 h-32 object-cover rounded-lg cursor-pointer"
+        className="w-40 h-40 object-cover rounded-lg cursor-pointer"
         onClick={() => openImagePopup(complaint, index)}
       />
     ))}
@@ -375,12 +382,19 @@ const Profile: React.FC = () => {
                     </>
                   )}
                 </div>
+                
               </div>
+              
             </div>
+            
           )}
+          
         </div>
+        
       </div>
+      
     </div>
+    
   );
 };
 

@@ -8,6 +8,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import Loading from "../utilities/Loading";
 
 const Orders: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState("");
   const [orders, setOrders] = useState<any[]>([]);
   const [userid, setUserid] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -98,6 +99,13 @@ const Orders: React.FC = () => {
     }
   };
 
+  const filteredOrders = orders.filter(
+    (order) =>
+      searchQuery === "" ||
+      order.title.toLowerCase().includes(searchQuery.toLowerCase()) 
+  );
+  
+
   if(loading){
     return <Loading/>;
   }
@@ -108,10 +116,18 @@ const Orders: React.FC = () => {
       <div className="w-full max-w-6xl p-8 space-y-6 bg-white rounded-lg shadow-lg">
         <h2 className="text-center text-3xl font-bold text-gray-900">Your Orders</h2>
 
-        {orders.length === 0 ? (
+        <input
+          type="text"
+          placeholder="Search orders..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        {filteredOrders.length === 0 ? (
           <p className="text-center">No orders available.</p>
         ) : (
-          orders.map((order) => (
+          filteredOrders.map((order) => (
             <div key={order.id} className="p-4 bg-gray-50 rounded-lg shadow space-y-4">
               <h3 className="text-xl font-bold">{order.title}</h3>
               <p>{order.description}</p>

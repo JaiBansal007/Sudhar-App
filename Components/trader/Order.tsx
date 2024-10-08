@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Loading from "../utilities/Loading";
  
 const PastOrders: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState("");
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [userid, setUserid] = useState<string>("");
@@ -61,6 +62,12 @@ const PastOrders: React.FC = () => {
     const prevIndex = (currentIndex - 1 + selectedOrder.images.length) %selectedOrder.images.length;
     setCurrentIndex(prevIndex);
   };
+
+  const filteredOrders = orders.filter(
+    (order) =>
+      searchQuery === "" ||
+      order.title.toLowerCase().includes(searchQuery.toLowerCase()) 
+  );
  
   if (loading) {
     return <Loading />;
@@ -70,11 +77,19 @@ const PastOrders: React.FC = () => {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-6xl p-8 space-y-6 bg-white rounded-lg shadow-lg">
         <h2 className="text-center text-3xl sm:text-4xl font-bold text-gray-900">Paid Orders</h2>
+
+        <input
+          type="text"
+          placeholder="Search Paid Orders..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
  
-        {orders.length === 0 ? (
+        {filteredOrders.length === 0 ? (
           <p className="text-center text-sm sm:text-base">No paid orders available.</p>
         ) : (
-          orders.map((order, orderIndex) => order.status === "payment_done" && (
+          filteredOrders.map((order, orderIndex) => order.status === "payment_done" && (
             <div key={order.id} className="p-4 bg-gray-50 rounded-lg shadow">
               <h3 className="text-xl sm:text-2xl font-bold mb-2">{order.title}</h3>
               <p className="text-gray-600 text-sm sm:text-base">Description: {order.description}</p>
