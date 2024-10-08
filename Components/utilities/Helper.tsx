@@ -90,6 +90,15 @@ interface DealersOrder{
 
 }
 
+interface Post{
+    id:string;
+    userid:string;
+    title:string;
+    description:string;
+    imageurl:string;
+    createdAt:Date;
+}
+
 //AUTH
 export const isLogin = (): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -278,11 +287,4 @@ export const getallposts=async():Promise<Post[]>=>{
         console.error("Error fetching posts:", error);
         throw error;
     }
-}
-
-
-//security
-export const encrypt = async(password: string): string => {
-    const pss=await bcrypt.hash(password, 10);
-    return pss;
 }
