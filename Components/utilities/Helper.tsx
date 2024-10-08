@@ -16,7 +16,15 @@ interface MCDData{
 interface trading{
 
 }
+interface UserOrder{
 
+}
+interface Complaints{
+
+}
+interface DealersOrder{
+  
+}
 //AUTH
 export const isLogin = (): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -117,7 +125,7 @@ export const getMCDData = async (email: string): Promise<MCDData> => {
 
 //orders
 
-export const getuserallorders=async(userid:string):Promise<any>=>{
+export const getuserallorders=async(userid:string):Promise<UserOrder[]>=>{
     try{
         const q= query(collection(db, 'orders'), where('userid', '==', userid));
         const querySnapshot = await getDocs(q);
@@ -133,7 +141,7 @@ export const getuserallorders=async(userid:string):Promise<any>=>{
 
 //dealer orders
 
-export const getdealerallorders = async (dealerid: string): Promise<any[]> => {
+export const getdealerallorders = async (dealerid: string): Promise<DealersOrder[]> => {
     try {
       const q = query(collection(db, 'dealer_orders'), where('dealerid', '==', dealerid));
       const querySnapshot = await getDocs(q);
@@ -147,7 +155,8 @@ export const getdealerallorders = async (dealerid: string): Promise<any[]> => {
     }
 };
 
-export const getallcomplaints=async(pincode:string):Promise<any[]>=>{
+//complaints
+export const getallcomplaints=async(pincode:string):Promise<Complaints[]>=>{
     try{
         const q= query(collection(db, 'complaints'), where('pincode', '==', pincode));
         const querySnapshot = await getDocs(q);
