@@ -2,7 +2,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth ,db} from '@/firebase/config';
 import { getDoc ,doc, query, collection, getDocs, where} from 'firebase/firestore';
-
+import bcrypt from 'bcrypt';
 //interfaces
 interface UserData{
 
@@ -217,4 +217,11 @@ export const getallposts=async():Promise<Post[]>=>{
         console.error("Error fetching posts:", error);
         throw error;
     }
+}
+
+
+//security
+export const encrypt = async(password: string): string => {
+    const pss=await bcrypt.hash(password, 10);
+    return pss;
 }

@@ -65,7 +65,7 @@ export default function Post() {
     };
 
     useEffect(() => {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
+      onAuthStateChanged(auth, (user) => {
         if (user) {
           setUserId(user.uid);
         } else {
