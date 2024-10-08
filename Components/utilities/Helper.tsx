@@ -5,27 +5,88 @@ import { getDoc ,doc, query, collection, getDocs, where} from 'firebase/firestor
 
 //interfaces
 interface UserData{
+    id:string ;
+    balance: number;
+    name:string;
+    email:string;
+    password:string;
+    phone_number:number;
+    
 
 }
 interface DealerData{
+    id:string;
+    email:string;
+    password:string;
+    balance:number;
+    address:string;
+    pincode:number;
+    lng:string;
+    lat:string;
+    phone_number:number;
   
 }
 interface MCDData{
+    id:string;
+    email:string;
+    password:string;
+    pincode:number;
     
 }  
 interface trading{
+    userid:string;
+    dealerid:string;
+    id:string;
+    title:string;
+    description:string;
 
+    price:number;
+    quantity:number;
+
+    pincode:number;
+    address:string;
+    district:string; 
+    state:string;
+    createdAt: Date;
+
+    status:'payment_done'|'pending';
 }
 interface UserOrder{
 
+    userid:string;
+    id:string;
+    voucherPrice:number;
+    voucherName:string;
+    time:Date;
+
 }
 interface Complaints{
+    userid:string;
+    id:string;
+
+    title:string;
+    description:string;
+
+    imageurl:string[];
+
+    lat:string;
+    lng:string;
+    pincode:number;
+    location:string;
+
+    status: 'pending' | 'resolved';
+
+    time:Date;
+
+
 
 }
 interface DealersOrder{
-
-}
-interface Post{
+    dealerid:string;
+    id:number;
+    voucherPrice:number;
+    voucherName:string;
+    time:Date;
 
 }
 
