@@ -31,7 +31,7 @@ export default function Forgot(){
             });
 
             toast.success("Password Reset Successfully");
-            router.push("user/signin");
+            router.push("/user/signin");
           } else {
             toast.error("User does not exist");
           }

@@ -169,7 +169,7 @@ const ReceivedComplaints: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-4xl font-bold text-gray-900 mb-8">Received Complaints</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Received Complaints</h1>
 
       <div className="w-full max-w-3xl space-y-6">
         {complaints.map((complaint) => (

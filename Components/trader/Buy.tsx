@@ -246,7 +246,11 @@ const Buy: React.FC = () => {
                     </p>
                   </div>
  
-                  <div className="flex space-x-2 mt-3 sm:mt-4 overflow-x-auto">
+                  <div className="flex space-x-2 mt-3 sm:mt-4 overflow-x-auto"
+                  style={{
+                    scrollbarWidth: 'none', // For Firefox
+                    msOverflowStyle: 'none', // For Internet Explorer
+                  }}>
                     {order.images.map((image: string, index: number) => (
                       <img
                         key={index}
@@ -260,6 +264,11 @@ const Buy: React.FC = () => {
                       />
                     ))}
                   </div>
+                  <style jsx>{`
+  div::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+  }
+`}</style>
  
                   <div className="offer-section mt-2 p-3 sm:p-4 rounded-lg bg-white shadow-md">
                     {order.status === "accepted" ? (
