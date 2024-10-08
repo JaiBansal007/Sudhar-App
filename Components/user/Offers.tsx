@@ -8,15 +8,16 @@ import { doc, getDoc } from 'firebase/firestore';
 
 const OffersPage: React.FC = () => {
   const router = useRouter();
-  const [walletBalance,setwalletBalance] = useState(0); // Available balance
-  const [userId,setuserId]=useState("");
-  // Sample offers data with deadlines
+  const [walletBalance,setwalletBalance] = useState<number>(0); // Available balance
+  const [userId,setuserId]=useState<string>("");
+  
   const initialOffers = [
     { name: "50% Off on Electronics", price: 5000, deadline: "2024-09-30" },
     { name: "Buy 1 Get 1 Free on Apparel", price: 300, deadline: "2024-10-01" },
     { name: "₹200 Cashback on Orders Above ₹1000", price: 200, deadline: "2024-09-30" },
     { name: "Free Shipping on Orders Above ₹500", price: 0, deadline: "2024-09-29" },
   ];
+
   useEffect(()=>{
     onAuthStateChanged(auth,async (user)=>{
       if(user){
@@ -34,6 +35,7 @@ const OffersPage: React.FC = () => {
 
     // console.log(data);
   },[]);
+
   const [offers, setOffers] = useState(initialOffers.sort((a, b) => a.price - b.price)); // Sorted by price
   const [searchQuery, setSearchQuery] = useState('');
 

@@ -29,7 +29,7 @@ const Report: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [location, setLocation] = useState<LocationType | null>(null);
   const [address, setAddress] = useState<string>("");
-  const [manualAddress, setManualAddress] = useState<string>("");
+  const [manualAddress, setManualAddress] = useState<string>("");   
   const [cameraOn, setCameraOn] = useState<boolean>(false);
   const [formValid, setFormValid] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
@@ -115,7 +115,7 @@ const Report: React.FC = () => {
       const context = canvasRef.current.getContext('2d');
       if (context) {
         context.drawImage(videoRef.current, 0, 0, 224, 224);
-        const imageData = canvasRef.current.toDataURL(`image/png/${Math.random()*100000}`);
+        const imageData = canvasRef.current.toDataURL(`image/png`);
         setImagePreviews((prev) => [...prev, imageData]);
         imagePreviews.forEach((src, index) => {
             setimageData((prev) => [...prev,src]);

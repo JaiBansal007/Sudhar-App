@@ -28,11 +28,13 @@ interface Complaint {
 
 const ReceivedComplaints: React.FC = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
-  const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null); // To store the complaint for map display
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0); // To keep track of the selected image index
-  const [isImageModalOpen, setIsImageModalOpen] = useState<boolean>(false); // To handle image modal visibility
+  const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const [isImageModalOpen, setIsImageModalOpen] = useState<boolean>(false);
+  const [isMapModalOpen, setIsMapModalOpen] = useState<boolean>(false);
   const router = useRouter();
 
+  // Fetch complaints from Firestore
   const fetchPosts = async () => {
     try {
       const postsRef = collection(firestore, "users");
@@ -74,24 +76,21 @@ const ReceivedComplaints: React.FC = () => {
     }
   };
 
+  // Send email notification using EmailJS
   const sendEmail = (userEmail: string, complaintTitle: string, complaintDescription: string) => {
     const templateParams = {
       to_email: userEmail,
       complaint_title: complaintTitle,
     };
 
-    emailjs
-      .send("service_wnx2w9e", "template_v0rtbra", templateParams, "ZpB1pNgDUa6B2o-2f")
+    emailjs.send("service_wnx2w9e", "template_v0rtbra", templateParams, "ZpB1pNgDUa6B2o-2f")
       .then(
-        (result) => {
-          console.log("Email sent successfully:", result.text);
-        },
-        (error) => {
-          console.error("Error sending email:", error.text);
-        }
+        (result) => console.log("Email sent successfully:", result.text),
+        (error) => console.error("Error sending email:", error.text)
       );
   };
 
+  // Mark a complaint as resolved or pending
   const markAsCompleted = async (props: any) => {
     try {
       const userRef = doc(db, "users", props.userid);
@@ -103,18 +102,14 @@ const ReceivedComplaints: React.FC = () => {
 
         const updatedComplaints = complaints.map((complaint: any) => {
           if (complaint.id === props.complaintid) {
-            sendEmail(userData.email, complaint.title, complaint.description); // Send email when complaint is marked as resolved
-            return {
-              ...complaint,
-              status: complaint.status === "resolved" ? "active" : "resolved", // Toggle between active and resolved
-            };
+            sendEmail(userData.email, complaint.title, complaint.description);
+            return { ...complaint, status: complaint.status === "resolved" ? "active" : "resolved" };
           }
           return complaint;
         });
 
         await updateDoc(userRef, { complaint: updatedComplaints });
         fetchPosts();
-        console.log("Complaint status updated to resolved.");
       } else {
         console.log("User not found.");
       }
@@ -123,26 +118,34 @@ const ReceivedComplaints: React.FC = () => {
     }
   };
 
+  // Open map modal
   const openMapModal = (complaint: Complaint) => {
-    setSelectedComplaint(complaint); // Set the complaint for which the map should be shown
+    setSelectedComplaint(complaint);
+    setIsMapModalOpen(true);
+    setIsImageModalOpen(false);
   };
 
-  const closeMapModal = () => {
-    setSelectedComplaint(null); // Close the modal
-  };
-
+  // Open image modal
   const openImageModal = (complaint: Complaint, index: number) => {
     setSelectedComplaint(complaint);
     setSelectedImageIndex(index);
     setIsImageModalOpen(true);
+    setIsMapModalOpen(false);
   };
 
+  // Close image modal
   const closeImageModal = () => {
     setIsImageModalOpen(false);
     setSelectedComplaint(null);
-    console.log("Image modal closed.");
   };
 
+  // Close map modal
+  const closeMapModal = () => {
+    setIsMapModalOpen(false);
+    setSelectedComplaint(null);
+  };
+
+  // Handle image navigation
   const handleImageNavigation = (direction: "left" | "right") => {
     if (selectedComplaint) {
       const totalImages = selectedComplaint.imageurl.length;
@@ -154,13 +157,14 @@ const ReceivedComplaints: React.FC = () => {
     }
   };
 
+  // Monitor auth state and fetch complaints on component mount
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, (user) => {
       if (!user) {
         router.push("/mcd/signin");
       }
     });
-    fetchPosts(); // Fetch posts when component mounts
+    fetchPosts();
   }, []);
 
   return (
@@ -177,7 +181,7 @@ const ReceivedComplaints: React.FC = () => {
               {complaint.imageurl && complaint.imageurl.length > 0 ? (
                 <>
                   <img
-                    src={complaint.imageurl[selectedImageIndex]}
+                    src={(complaint.id==selectedComplaint?.id)?complaint.imageurl[selectedImageIndex]:complaint.imageurl[0]}
                     alt={complaint.title}
                     className="w-full h-40 object-cover rounded-lg"
                     onClick={() => openImageModal(complaint, 0)}
@@ -185,13 +189,20 @@ const ReceivedComplaints: React.FC = () => {
                   {complaint.imageurl.length > 1 && (
                     <>
                       <button
-                        onClick={() => setSelectedImageIndex((prevIndex) => (prevIndex - 1 + complaint.imageurl.length) % complaint.imageurl.length)}
+                        onClick={() => {
+                          setSelectedComplaint(complaint)
+                          setSelectedImageIndex((prevIndex) => (prevIndex - 1 + complaint.imageurl.length) % complaint.imageurl.length)
+                        }}
                         className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full"
                       >
                         <ArrowBackIosIcon />
                       </button>
                       <button
-                        onClick={() => setSelectedImageIndex((prevIndex) => (prevIndex + 1) % complaint.imageurl.length)}
+                        onClick={() => {
+                          setSelectedComplaint(complaint)
+                          setSelectedImageIndex((prevIndex) => (prevIndex + 1) % complaint.imageurl.length)
+                        }
+                        }
                         className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full"
                       >
                         <ArrowForwardIosIcon />
@@ -240,7 +251,9 @@ const ReceivedComplaints: React.FC = () => {
                   )}
 
                   <button
-                    onClick={() => openMapModal(complaint)}
+                    onClick={() => {
+                      openMapModal(complaint)
+                    }}
                     className="hidden sm:block bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300"
                   >
                     <LocationOnIcon className="text-blue-800" />
@@ -271,7 +284,7 @@ const ReceivedComplaints: React.FC = () => {
       </div>
 
       {/* Modal for Map */}
-      {selectedComplaint && !isImageModalOpen && (
+      {selectedComplaint && isMapModalOpen && (
         <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow-lg w-3/4 max-w-3xl p-6 pt-4 relative">
             <button
@@ -303,7 +316,10 @@ const ReceivedComplaints: React.FC = () => {
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md md:max-w-lg p-4 relative">
             <button
               type="button"
-              onClick={closeImageModal}
+              onClick={()=>{
+                closeImageModal();
+                setSelectedComplaint(null);
+              }}
               className="w-full text-right text-gray-600 hover:text-gray-800"
             >
               <CancelIcon className="text-red-600" />
