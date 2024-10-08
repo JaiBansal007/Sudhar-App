@@ -23,8 +23,12 @@ interface Complaints{
 
 }
 interface DealersOrder{
-  
+
 }
+interface Post{
+
+}
+
 //AUTH
 export const isLogin = (): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -196,6 +200,21 @@ export const getDealertradingdetails=async(dealerid:string):Promise<trading[]>=>
         return trading_details;
     }catch(error){
         console.error("Error fetching trading details:", error);
+        throw error;
+    }
+}
+
+//post 
+export const getallposts=async():Promise<Post[]>=>{
+    try{
+        const q= query(collection(db, 'post'));
+        const querySnapshot = await getDocs(q);
+        const posts = querySnapshot.docs.map(doc => ({
+            ...doc.data()
+        }));
+        return posts;
+    }catch(error){
+        console.error("Error fetching posts:", error);
         throw error;
     }
 }
