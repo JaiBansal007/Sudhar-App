@@ -83,7 +83,8 @@ export interface DealersOrder{
     voucherPrice:number;
     voucherName:string;
     time:Date;
-
+    lat:string;
+    long:string;
 }
 export interface Post{
     id:string;
@@ -93,5 +94,10 @@ export interface Post{
     imageurl:string;
     createdAt:Date;
 }
-
+export interface AdminData{
+    id:string;
+    email:string;
+    password:string;
+    income:number;
+}
 

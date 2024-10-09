@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { getUserData } from "../utilities/Helper";
 interface Complaint {
   id: string;
   title: string;
@@ -39,7 +38,7 @@ const Profile: React.FC = () => {
           router.push("/user/signin");
         }
       });
-    };
+    };  
 
     fetchDetails();
   }, [router]);
