@@ -3,9 +3,12 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebase/config";
+import { isMCDExist } from "../utilities/Helper";
+import Loading from "../utilities/Loading";
 const Profile: React.FC = () => {
   const [userID, setUserID] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
   useEffect(() => {
     const fetchDetails = async () => {
@@ -14,12 +17,24 @@ const Profile: React.FC = () => {
           setUserID(user.uid);
           setUserEmail(user.email);
         } else {
+          setLoading(false);
           router.push("/mcd/signin");
         }
       });
+      const existmcd= await isMCDExist(userEmail||"");
+          if(!existmcd){
+            setLoading(false);
+            router.push("/user/signin");
+      }
+      setLoading(false);
     };
+
     fetchDetails();
+
   }, [router]);
+  if(loading){
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center px-4 sm:px-6 lg:px-8">
