@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { db ,auth} from "@/firebase/config";
+import { db, auth } from "@/firebase/config";
 import { collection, query, where, getDocs, updateDoc, doc, getDoc, arrayUnion } from "firebase/firestore"; // Firestore functions
 import { toast, Toaster } from "react-hot-toast"; // For toaster message
-import {useRouter} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { onAuthStateChanged } from "firebase/auth";
 import Loading from "../utilities/Loading";
 
@@ -22,11 +22,11 @@ const Orders: React.FC = () => {
         if (user) {
           setUserid(user.uid);
           try {
-            const userdata=doc(db,"users",user.uid);
-            const usersnap=await getDoc(userdata);
-            if(usersnap){
-              const data=usersnap.data();
-              if(data){
+            const userdata = doc(db, "users", user.uid);
+            const usersnap = await getDoc(userdata);
+            if (usersnap) {
+              const data = usersnap.data();
+              if (data) {
                 setOrders(data["trading"]);
               }
             }
@@ -42,38 +42,6 @@ const Orders: React.FC = () => {
     };
     fetchDetails();
   }, []);
-
-  // Handle Accept or Reject Offer
-  const handleResponse = async (orderId: string, status: "accepted" | "rejected") => {
-    try {
-      const updatedtrading:any=orders.map((order) =>{
-        if(order.id===orderId){
-          return {...order,status};
-        }
-        return order;
-      });
-      setOrders(updatedtrading);
-      const orderRef = doc(db, "users", userid);
-      if(status==="accepted"){
-        await updateDoc(orderRef, {
-          trading: updatedtrading,
-        });
-        const dealerref=doc(db,"dealers",updatedtrading[0].dealerid);
-        const dealerdoc=await getDoc(dealerref);
-        await updateDoc(dealerref,{
-          trading:arrayUnion(updatedtrading[0])
-        });
-      }else{
-        await updateDoc(orderRef, {
-          trading: updatedtrading,
-          dealerid: "",
-        });
-      }
-      toast.success(`Offer ${status === "accepted" ? "accepted" : "rejected"} successfully!`);
-    } catch (error) {
-      toast.error("Error updating the order");
-    }
-  };
 
   const openImagePopup = (index: number, order: any) => {
     setCurrentIndex(index);
@@ -99,15 +67,15 @@ const Orders: React.FC = () => {
     }
   };
 
+  // Filter orders based on the search query
   const filteredOrders = orders.filter(
     (order) =>
       searchQuery === "" ||
-      order.title.toLowerCase().includes(searchQuery.toLowerCase()) 
+      order.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  
 
-  if(loading){
-    return <Loading/>;
+  if (loading) {
+    return <Loading />;
   }
 
   return (
@@ -135,10 +103,10 @@ const Orders: React.FC = () => {
 
               {/* Horizontal scroll for images */}
               <div className="flex space-x-2 mt-4 overflow-x-auto"
-              style={{
-                scrollbarWidth: 'none', // For Firefox
-                msOverflowStyle: 'none', // For Internet Explorer
-              }}>
+                style={{
+                  scrollbarWidth: 'none', // For Firefox
+                  msOverflowStyle: 'none', // For Internet Explorer
+                }}>
                 {order.images.map((image: string, index: number) => (
                   <img
                     key={index}
@@ -150,37 +118,19 @@ const Orders: React.FC = () => {
                 ))}
               </div>
               <style jsx>{`
-  div::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
-  }
-`}</style>
+                div::-webkit-scrollbar {
+                  display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+                }
+              `}</style>
 
               {order.status === "pending" ? (
-                <p className="text-yellow-500 font-semibold">Waiting for Dealer Offer</p>
-              ) : order.status === "offer_made" ? (
-                <div className="space-y-4">
-                  <p className="text-green-500 font-semibold">Dealer's Offer: ₹{order.price}</p>
-                  <div className="flex space-x-4">
-                    <button
-                      onClick={() => handleResponse(order.id, "accepted")}
-                      className="bg-blue-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-blue-600"
-                    >
-                      Accept Offer
-                    </button>
-                    <button
-                      onClick={() => handleResponse(order.id, "rejected")}
-                      className="bg-red-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-red-600"
-                    >
-                      Reject Offer
-                    </button>
-                  </div>
+                <div>
+                  <p className="text-yellow-500 font-semibold">Waiting for Dealer Offer</p>
+                  <p className="text-green-500 font-semibold">Selling Price: ₹{order.price}</p> {/* Display selling price */}
                 </div>
-              ) : order.status === "accepted" ? (
-                <p className="text-green-500 font-semibold">Offer Accepted. Waiting for Dealer to Make Payment.</p>
-              ) : order.status === "rejected" ? (
-                <p className="text-red-500 font-semibold">Offer Rejected</p>
               ) : order.status === "payment_done" ? (
-                <p className="text-green-500 font-semibold flex flex-col">Payment Received. <span className="text-sm">Now dealer will collect scrap from your house</span> </p>):null}
+                <p className="text-green-500 font-semibold flex flex-col">Payment Received. <span className="text-sm">Now dealer will collect scrap from your house</span></p>
+              ) : null}
             </div>
           ))
         )}
