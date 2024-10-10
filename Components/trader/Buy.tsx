@@ -48,7 +48,8 @@ const Buy: React.FC = () => {
               state: post.state,
               district: post.district,
               useraddress: post.address,
-              dealerid: post.dealerid,
+              dealerid: post.dealerid
+              
             }));
           }
           return [];
@@ -90,41 +91,6 @@ const Buy: React.FC = () => {
     setLoading(true);
     fetchPosts();
   }, []);
- 
-  const handleSubmitOffer = async (props: any) => {
-    try {
-      if (number <= 0 || number > 10000) {
-        toast.error("Please enter a valid amount!");
-        return;
-      }
-      const userRef = doc(db, "users", props.userid);
-      const userSnap = await getDoc(userRef);
- 
-      if (userSnap.exists()) {
-        const userData = userSnap.data();
-        const complaints = userData.trading || [];
-        const updatedComplaints = complaints.map((complaint: any) => {
-          if (complaint.id === props.tradingid) {
-            return {
-              ...complaint,
-              price: number,
-              status: "offer_made",
-              dealerid: dealerid,
-            };
-          }
-          return complaint;
-        });
- 
-        await updateDoc(userRef, { trading: updatedComplaints });
-        fetchPosts();
-        toast.success("Offer submitted successfully!");
-      } else {
-        console.log("User not found.");
-      }
-    } catch (error) {
-      console.error("Error :", error);
-    }
-  };
  
   const handleMakePayment = (order: any) => {
     if(order.price*1.05 > walletBalance) {
@@ -224,7 +190,7 @@ const Buy: React.FC = () => {
           orders.map(
             (order) =>
               order.status != "payment_done" &&
-              (order.status == "accepted" ? order.dealerid == dealerid : true) && (
+              (order.status == "" ? order.dealerid == dealerid : true) && (
                 <div key={order.id} className="p-3 sm:p-4 bg-gray-50 rounded-lg shadow">
                   <h3 className="text-lg sm:text-xl font-bold mb-1">{order.title}</h3>
                   <p className="text-sm sm:text-base text-gray-600">Description: {order.description}</p>
@@ -271,10 +237,10 @@ const Buy: React.FC = () => {
 `}</style>
  
                   <div className="offer-section mt-2 p-3 sm:p-4 rounded-lg bg-white shadow-md">
-                    {order.status === "accepted" ? (
+                    {order.status === "pending" ? (
                       <>
                         <p className="text-green-600 font-semibold text-base sm:text-lg flex justify-between items-center">
-                          ✅ Offer Accepted <span>Amount: {order.price}</span>
+                          ✅ Selling Price <span>Amount: {order.price}</span>
                         </p>
                         <button
                           onClick={() => handleMakePayment(order)}
@@ -283,42 +249,8 @@ const Buy: React.FC = () => {
                           Make Payment
                         </button>
                       </>
-                    ) : order.status === "offer_made" ? (
-                      <p className="text-yellow-500 font-semibold text-base sm:text-lg flex justify-between items-center">
-                        ⏳ Waiting for User Response <span>Offer Submitted: {order.price}</span>
-                      </p>
-                    ) : order.status === "rejected" ? (
-                      <>
-                        <p className="text-red-500 font-semibold text-base sm:text-lg">❌ Offer Rejected</p>
-                        <div className="mt-3 sm:mt-4">
-                          <input
-                            type="number"
-                            className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300"
-                            placeholder="Enter offer amount"
-                            onChange={(e) => setNumber(Number(e.target.value))}
-                          />
-                          <button
-                            onClick={() => handleSubmitOffer({ userid: order.userid, tradingid: order.orderid })}
-                            className="mt-3 sm:mt-4 w-full sm:w-auto bg-green-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-green-600 transition-colors"
-                          >
-                            Submit Offer
-                          </button>
-                        </div>
-                      </>
-                    ) : order.status === "pending" && (
+                    )  : order.status === "" && (
                       <div className="mt-3 sm:mt-4">
-                        <input
-                          type="number"
-                          className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300"
-                          placeholder="Enter offer amount"
-                          onChange={(e) => setNumber(Number(e.target.value))}
-                        />
-                        <button
-                          onClick={() => handleSubmitOffer({ userid: order.userid, tradingid: order.orderid })}
-                          className="mt-3 sm:mt-4 w-full sm:w-auto bg-green-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-green-600 transition-colors"
-                        >
-                          Submit Offer
-                        </button>
                       </div>
                     )}
                   </div>
