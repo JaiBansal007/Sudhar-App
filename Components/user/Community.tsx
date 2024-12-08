@@ -35,12 +35,12 @@ export default function Community() {
         const postsRef = collection(firestore, 'post');
         const data=await getDocs(postsRef);
       //   // Fetch the documents from the 'post' collection using getDocs
-        console.log(data.docs);
+        // console.log(data.docs);
         const userRecord = data.docs.map((doc) => ({
           id: doc.id, // This includes the user's email as the ID
           ...doc.data(), // This spreads out the data fields (e.g., `data`)
       }));
-      console.log(userRecord);
+      // console.log(userRecord);
       const formatUserPosts = (rawPosts: any[]): any[] => {
         // Combine all user posts into a single array
         const combinedPosts = rawPosts.flatMap(user => 
@@ -57,7 +57,7 @@ export default function Community() {
                 userId: user.id,  // Optionally include the user ID for reference
             }))
         );
-        console.log('Combined posts:', combinedPosts);
+        // console.log('Combined posts:', combinedPosts);
     return combinedPosts;
 };
     const combinedPostsArray = formatUserPosts(userRecord);

@@ -16,16 +16,17 @@ const Profile: React.FC = () => {
         if (user) {
           setUserID(user.uid);
           setUserEmail(user.email);
+          const existmcd= await isMCDExist(user.email||"");
+          console.log(user.email);
+          if(!existmcd){
+            setLoading(false);
+            router.push("/user/signin");
+          }
         } else {
           setLoading(false);
           router.push("/mcd/signin");
         }
       });
-      const existmcd= await isMCDExist(userEmail||"");
-          if(!existmcd){
-            setLoading(false);
-            router.push("/user/signin");
-      }
       setLoading(false);
     };
 

@@ -35,6 +35,7 @@ export default function Signin() {
     try{
       await signInWithEmailAndPassword(auth,email,password);
       router.push('/mcd/profile');
+      console.log('Login Successful');
     }catch(error){
       try {
         // Fetch all the documents from the "mcd" collection
