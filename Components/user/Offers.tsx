@@ -45,7 +45,7 @@ const OffersPage: React.FC = () => {
   const handleVoucherClick = (name: string, price: number) => {
     if (price <= walletBalance) {
       // Pass voucher name and price to the transaction page as query parameters
-      router.push(`/transaction?voucherName=${encodeURIComponent(name)}&voucherPrice=${price}`);
+      router.push(`/user/transaction?voucherName=${encodeURIComponent(name)}&voucherPrice=${price}`);
     }
   };
 
