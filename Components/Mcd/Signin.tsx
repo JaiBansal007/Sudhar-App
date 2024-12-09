@@ -71,24 +71,24 @@ export default function Signin() {
   const googleRegister = async () => {
     toast.error("Access Denied");
     router.push('/mcd/signin');
-    // try {
-    //   const res = await signInWithPopup(auth, googleAuthProvider);
-    //   const userId = res.user.uid;
+    try {
+       const res = await signInWithPopup(auth, googleAuthProvider);
+       const userId = res.user.uid;
 
-    //   const userDocRef = doc(db, "mcd", userId);
-    //   const userSnap = await getDoc(userDocRef);
+       const userDocRef = doc(db, "mcd", userId);
+       const userSnap = await getDoc(userDocRef);
 
-    //   if (userSnap.exists()) {
-    //     router.push("/mcd/profile");
-    //     toast.success("Successfully Logged in");
-    //   } else {
-    //     router.push("/mcd/signin");
-    //     toast.error("Access Denied");
-    //   }
-    // } catch (error) {
-    //   toast.error("Login Failed");
-    //   console.log(error);
-    // }
+       if (userSnap.exists()) {
+         router.push("/mcd/profile");
+         toast.success("Successfully Logged in");
+       } else {
+         router.push("/mcd/signin");
+         toast.error("Access Denied");
+       }
+     } catch (error) {
+       toast.error("Login Failed");
+       console.log(error);
+    }
   };
 
   return (

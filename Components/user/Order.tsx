@@ -67,6 +67,41 @@ const Orders: React.FC = () => {
     }
   };
 
+  // Handle Accept or Reject Offer
+  const handleResponse = async (orderId: string, status: "accepted" | "rejected") => {
+    try {
+      
+      const updatedtrading:any=orders.map((order) =>{
+        if(order.id===orderId){
+          return {...order,status};
+        }
+        return order;
+      });
+      setOrders(updatedtrading);
+      const orderRef = doc(db, "users", userid);
+      if(status==="accepted"){
+        await updateDoc(orderRef, {
+          trading: updatedtrading,
+        });
+        const dealerref=doc(db,"dealers",updatedtrading[0].dealerid);
+        const dealerdoc=await getDoc(dealerref);
+        await updateDoc(dealerref,{
+          trading:arrayUnion(updatedtrading[0])
+        });
+      }else{
+        await updateDoc(orderRef, {
+          trading: updatedtrading,
+          dealerid: "",
+        });
+      }
+      console.log("Order updated successfully!");
+      toast.success(`Offer ${status === "accepted" ? "accepted" : "rejected"} successfully!`);
+    } catch (error) {
+      console.error("Error updating order: ", error);
+      toast.error("Error updating the order");
+    }
+  };
+
   // Filter orders based on the search query
   const filteredOrders = orders.filter(
     (order) =>
@@ -123,14 +158,34 @@ const Orders: React.FC = () => {
                 }
               `}</style>
 
-              {order.status === "pending" ? (
-                <div>
-                  <p className="text-yellow-500 font-semibold">Waiting for Dealer Offer</p>
-                  <p className="text-green-500 font-semibold">Selling Price: ₹{order.price}</p> {/* Display selling price */}
+{order.status === "pending" ? (
+                <p className="text-yellow-500 font-semibold">Waiting for Dealer Offer</p>
+              ) : order.status === "offer_made" ? (
+                <div className="space-y-4">
+                  <p className="text-green-500 font-semibold">
+                    Dealer's Offer: ₹{order.price}
+                  </p>
+                  <div className="flex space-x-4">
+                    <button
+                      onClick={() => handleResponse(order.id, "accepted")}
+                      className="bg-blue-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-blue-600"
+                    >
+                      Accept Offer
+                    </button>
+                    <button
+                      onClick={() => handleResponse(order.id, "rejected")}
+                      className="bg-red-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-red-600"
+                    >
+                      Reject Offer
+                    </button>
+                  </div>
                 </div>
+              ) : order.status === "accepted" ? (
+                <p className="text-green-500 font-semibold">Offer Accepted</p>
+              ) : order.status === "rejected" ? (
+                <p className="text-red-500 font-semibold">Offer Rejected</p>
               ) : order.status === "payment_done" ? (
-                <p className="text-green-500 font-semibold flex flex-col">Payment Received. <span className="text-sm">Now dealer will collect scrap from your house</span></p>
-              ) : null}
+                <p className="text-green-500 font-semibold flex flex-col">Payment Done. <span className="text-sm">Now dealer will collect scrap from your house</span> </p>):null}
             </div>
           ))
         )}

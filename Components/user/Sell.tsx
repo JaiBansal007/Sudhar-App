@@ -70,10 +70,6 @@ const Sell: React.FC = () => {
       toast.error("Please enter a description.");
       return false;
     }
-    if (!price.trim()) {
-      toast.error("Please enter a selling price.");
-      return false;
-    }
     if (images.length < 2) {
       toast.error("Please upload at least two images.");
       return false;
@@ -94,36 +90,36 @@ const Sell: React.FC = () => {
       toast.error("Please enter a detailed address.");
       return false;
     }
-    if (!latitude || !longitude) {
-      toast.error("Please detect your location.");
-      return false;
-    }
+    // if (!latitude || !longitude) {
+    //   toast.error("Please detect your location.");
+    //   return false;
+    // }
     return true;
   };
 
-  const handleLocationDetection = async () => {
-    try {
-      // Use browser geolocation API to get latitude and longitude
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const { latitude, longitude } = position.coords;
-        setLatitude(latitude.toString());
-        setLongitude(longitude.toString());
+  // const handleLocationDetection = async () => {
+  //   try {
+  //     // Use browser geolocation API to get latitude and longitude
+  //     navigator.geolocation.getCurrentPosition(async (position) => {
+  //       const { latitude, longitude } = position.coords;
+  //       setLatitude(latitude.toString());
+  //       setLongitude(longitude.toString());
 
-        const apiKey = "pk.52339090bdc5233b10b0a0aaeee3454d"; // Replace with your LocationIQ API key
-        const response = await axios.get(
-          `https://us1.locationiq.com/v1/reverse.php?key=${apiKey}&lat=${latitude}&lon=${longitude}&format=json`
-        );
-        const { display_name } = response.data;
-        setLocationDisplayName(display_name);
-        toast.success("Location detected successfully!");
-      }, () => {
-        toast.error("Unable to detect location. Please check permissions.");
-      });
-    } catch (error) {
-      console.error("Error detecting location:", error);
-      toast.error("Error detecting location");
-    }
-  };
+  //       const apiKey = "pk.52339090bdc5233b10b0a0aaeee3454d"; // Replace with your LocationIQ API key
+  //       const response = await axios.get(
+  //         `https://us1.locationiq.com/v1/reverse.php?key=${apiKey}&lat=${latitude}&lon=${longitude}&format=json`
+  //       );
+  //       const { display_name } = response.data;
+  //       setLocationDisplayName(display_name);
+  //       toast.success("Location detected successfully!");
+  //     }, () => {
+  //       toast.error("Unable to detect location. Please check permissions.");
+  //     });
+  //   } catch (error) {
+  //     console.error("Error detecting location:", error);
+  //     toast.error("Error detecting location");
+  //   }
+  // };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault(); // Prevent default form submission
@@ -150,10 +146,10 @@ const Sell: React.FC = () => {
         district,
         address,
         price,
-        location: {
-          latitude,
-          longitude,
-        },
+        // location: {
+        //   latitude,
+        //   longitude,
+        // },
       };
       const user = doc(db, "users", userId);
       const usersnap = await getDoc(user);
@@ -208,14 +204,14 @@ const Sell: React.FC = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
 
-          {/* Price Field */}
+          {/* Price Field
           <input
             className="w-full p-4 bg-gray-50 rounded-lg border border-gray-300"
             type="text"
             placeholder="Selling Price"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-          />
+          /> */}
 
           <div className="space-y-0">
             <div className="w-auto py-4 bg-gray-50 rounded-lg border border-gray-300 flex items-center md:pl-4">
@@ -330,7 +326,7 @@ const Sell: React.FC = () => {
               onChange={(e) => setAddress(e.target.value)}
             />
 
-            {/* Detect Location Button */}
+            {/* Detect Location Button
             <button
               className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               onClick={handleLocationDetection}
@@ -342,7 +338,7 @@ const Sell: React.FC = () => {
               <p className="text-gray-700">
                 Detected Location: {locationDisplayName}
               </p>
-            )}
+            )} */}
           </div>
 
           <button
