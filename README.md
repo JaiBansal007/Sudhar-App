@@ -15,12 +15,6 @@
 - **Pragati Verma** - 2023UCS1568 - [@pragativerma31](https://github.com/pragativerma31)
 - **Rohan Jhanwar** - 2023UCA1600 - [@RohanJ26](https://github.com/RohanJ26)
 - **Dhruv Tuteja** - 2023UIN3332 - [@Dhruv-Tuteja](https://github.com/Dhruv-Tuteja)
- 
-## Project Links
-
-- **SIH Presentation Drive Link:** [Final SIH Presentation](https://drive.google.com/drive/folders/1FKrGVy9RpMdMe-Bjey062_IWyBewR4nS)
-- **Video Demonstration:** [Watch Video](https://www.youtube.com/watch?v=CKF5m24i7qc)
-- **Source Code:** [GitHub Repository](https://github.com/JaiBansal007/Sudhar-App)
   
 Follow these steps to run the project locally
 
