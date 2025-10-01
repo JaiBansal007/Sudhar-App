@@ -16,7 +16,7 @@
 
 ## Project Links
 
-- **SIH Presentation:** [Final SIH Presentation](code/docs/SUDHAAR.pdf)
+- **SIH Presentation:** [Final SIH Presentation](docs/SUDHAAR.pdf)
 - **Video Demonstration:** [Watch Video](https://youtu.be/wS1blRJtoGY)
 - **Source Code:** [GitHub Repository](https://github.com/JaiBansal007/Sudhar-App)
 
