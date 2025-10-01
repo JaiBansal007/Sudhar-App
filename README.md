@@ -24,6 +24,18 @@
 
 **Sudhaar** (meaning "improvement" in Hindi) is a comprehensive digital platform designed to bridge the gap between various stakeholders in the public distribution and complaint management ecosystem. Built for the Smart India Hackathon, this Next.js application provides a unified solution for users, traders, municipal corporations, and administrators.
 
+## 🏗️ System Architecture & Workflows
+
+### System Workflow
+![System Workflow](docs/Workflow.png)
+
+*Complete system workflow showing the interaction between different user roles and system components*
+
+### API Workflow
+![API Workflow](docs/API-workflow.png)
+
+*Detailed API workflow diagram illustrating the backend processes and data flow*
+
 ## 🎯 Key Features
 
 ### 🔐 Multi-Role Authentication System
@@ -166,18 +178,6 @@ The application includes a pre-trained TensorFlow.js model located in `Public/my
 - **Integration**: Seamless browser-based inference
 - **Capabilities**: Real-time image classification and complaint categorization
 
-## 🏗️ System Architecture & Workflows
-
-### System Workflow
-![System Workflow](docs/Workflow.png)
-
-*Complete system workflow showing the interaction between different user roles and system components*
-
-### API Workflow
-![API Workflow](docs/API-workflow.png)
-
-*Detailed API workflow diagram illustrating the backend processes and data flow*
-
 ## 🔐 Authentication Flow
 
 The app supports multiple authentication methods:
@@ -192,44 +192,3 @@ The app supports multiple authentication methods:
 - Cross-platform compatibility
 - Progressive Web App (PWA) ready
 - Optimized for various screen sizes
-
-## 🚀 Quick Start Guide
-
-### For Development Team:
-1. Clone the repository
-2. Navigate to `Code/` directory
-3. Copy `.env.example` to `.env.local`
-4. Set up Firebase configuration
-5. Run `npm install` and `npm run dev`
-
-### For Users:
-- Access different modules based on your role:
-  - **Users**: `/user/signin` - General public interface
-  - **Traders**: `/trader/signin` - Marketplace access
-  - **MCD**: `/mcd/signin` - Municipal services
-  - **Admin**: `/admin/signin` - Administrative panel
-
-## 🔧 Troubleshooting
-
-If you encounter permission issues during installation:
-```bash
-sudo npm install
-sudo npm run dev
-```
-
-For Firebase configuration issues:
-1. Ensure all environment variables are properly set
-2. Verify Firebase project permissions
-3. Check Firebase rules for database access
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-Built with ❤️ by Team Tree.io for Smart India Hackathon
