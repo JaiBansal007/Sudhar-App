@@ -1,20 +1,25 @@
 ## Team Details
- 
-**Team Name:** 64 bits
 
-**PS Id:** 1592
- 
-**Team Leader:** [@JaiBansal007](https://github.com/JaiBansal007)
- 
+**Team Name:** Tree.io </br>
+**Team ID:** 101449
+
+**Team Leader:** [@Dhruv](https://github.com/Dhruv-Tuteja)
+
 **Team Members:**
- 
- 
-- **Jai Bansal** - 2023UCA1869 - [@JaiBansal007](https://github.com/JaiBansal007)
-- **Nayan Jindal** - 2023UCS1548 - [@NASA12345](https://github.com/NASA12345)
-- **Shubham Kumar Didharia** - 2023UCS1567 - [@ShubhamDidharia](https://github.com/ShubhamDidharia)
-- **Pragati Verma** - 2023UCS1568 - [@pragativerma31](https://github.com/pragativerma31)
-- **Rohan Jhanwar** - 2023UCA1600 - [@RohanJ26](https://github.com/RohanJ26)
-- **Dhruv Tuteja** - 2023UIN3332 - [@Dhruv-Tuteja](https://github.com/Dhruv-Tuteja)
+
+- **MEMBER_1** - 2023UIN3332 - [@Dhruv](https://github.com/Dhruv-Tuteja)
+- **MEMBER_2** - 2023UCS1548 - [@Nayan](https://github.com/NASA12345)
+- **MEMBER_3** - 2023UCA1804 - [@Tushar](https://github.com/TusharSachdeva29)
+- **MEMBER_4** - 2023UCA1869 - [@Jai](https://github.com/JaiBansal007)
+- **MEMBER_5** - 2023UCA1728 - [@Yashaswini](https://github.com/Yashaswini-Sharma)
+- **MEMBER_6** - 2023UCA1600 - [@Rohan](https://github.com/RohanJ26)
+
+## Project Links
+
+- **SIH Presentation:** [Final SIH Presentation](code/docs/SUDHAAR.pdf)
+- **Video Demonstration:** [Watch Video](https://youtu.be/wS1blRJtoGY)
+- **Source Code:** [GitHub Repository](https://github.com/JaiBansal007/Sudhar-App)
+
   
 Follow these steps to run the project locally
 
