@@ -1,5 +1,3 @@
-## Team Details
-
 **Team Name:** Tree.io </br>
 **Team ID:** 101449
 
@@ -20,26 +18,218 @@
 - **Video Demonstration:** [Watch Video](https://youtu.be/wS1blRJtoGY)
 - **Source Code:** [GitHub Repository](https://github.com/JaiBansal007/Sudhar-App)
 
-  
-Follow these steps to run the project locally
+# Sudhaar App 🌟
+
+## 📖 Overview
+
+**Sudhaar** (meaning "improvement" in Hindi) is a comprehensive digital platform designed to bridge the gap between various stakeholders in the public distribution and complaint management ecosystem. Built for the Smart India Hackathon, this Next.js application provides a unified solution for users, traders, municipal corporations, and administrators.
+
+## 🎯 Key Features
+
+### 🔐 Multi-Role Authentication System
+- **Users**: General public with complaint and service access
+- **Traders**: Marketplace participants for buying/selling
+- **MCD (Municipal Corporation)**: Service providers and complaint handlers
+- **Admin**: System administrators with oversight capabilities
+
+### 🤖 AI-Powered Complaint System
+- **Image Recognition**: Uses TensorFlow.js and Teachable Machine for automated complaint categorization
+- **Smart Classification**: Automatically identifies and categorizes complaints from uploaded images
+- **Location-Based Reporting**: GPS-enabled complaint submission with precise location tracking
+
+### 📱 Core Modules
+
+#### For Users:
+- **Complaint Management**: Submit, track, and manage complaints with AI assistance
+- **Community Platform**: Connect with local community members
+- **Marketplace**: Buy and sell products/services
+- **Digital Wallet**: Secure transaction management
+- **Profile Management**: Personal information and activity tracking
+
+#### For Traders:
+- **Inventory Management**: Track and manage product listings
+- **Order Processing**: Handle customer orders efficiently
+- **Wallet Integration**: Secure payment processing
+- **Authentication System**: Secure login and profile management
+
+#### For MCD:
+- **Complaint Resolution**: Manage and resolve public complaints
+- **Service Management**: Oversee municipal services
+- **Administrative Tools**: Monitor and manage system operations
+
+#### For Admins:
+- **System Oversight**: Complete platform management
+- **User Management**: Handle user accounts and permissions
+- **Analytics Dashboard**: Monitor platform performance and usage
+
+## 🛠️ Technology Stack
+
+### Frontend
+- **Next.js 14.2.8** - React-based framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first CSS framework
+- **Material-UI (MUI)** - React component library
+- **React Hot Toast** - Beautiful notifications
+
+### Backend & Database
+- **Firebase 10.13.1** - Backend-as-a-Service
+- **Firestore** - NoSQL document database
+- **Firebase Authentication** - User authentication
+- **Firebase Storage** - File storage and management
+
+### AI & Machine Learning
+- **TensorFlow.js** - Machine learning in the browser
+- **Teachable Machine** - Image classification model
+- **Custom ML Model** - Pre-trained model for complaint categorization
+
+### Additional Libraries
+- **EmailJS** - Email sending functionality
+- **React Router DOM** - Client-side routing
+- **Axios** - HTTP client for API requests
+- **Multer** - File upload handling
+- **bcrypt** - Password hashing
+- **Nodemailer** - Server-side email functionality
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- Firebase project setup
+
+### Installation
 
 1. **Clone the Repository**
    ```bash
    git clone https://github.com/JaiBansal007/Sudhar-App.git
-
    cd Sudhar-App
+   ```
 
-   touch .env.local
+2. **Navigate to Code Directory**
+   ```bash
+   cd Code
+   ```
 
-   then copy variables from .env.example
+3. **Install Dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+4. **Environment Setup**
+   ```bash
+   cp .env.example .env.local
+   ```
    
-   then setup firebase keys
+   Fill in your Firebase configuration:
+   ```env
+   NEXT_PUBLIC_API_KEY=your_firebase_api_key
+   NEXT_PUBLIC_AUTH_DOMAIN=your_project.firebaseapp.com
+   NEXT_PUBLIC_PROJECT_ID=your_project_id
+   NEXT_PUBLIC_STORAGE_BUCKET=your_project.appspot.com
+   NEXT_PUBLIC_MESSAGE_SENDER_ID=your_sender_id
+   NEXT_PUBLIC_APP_ID=your_app_id
+   NEXT_PUBLIC_MEASUREMENT_ID=your_measurement_id
+   ```
 
-2. **Run these commands**
-    ```bash
+5. **Run Development Server**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-    npm i
+6. **Open Application**
+   Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
 
-    npm run dev
 
-   --if not working, try above two npm commands with 'sudo'
+## 🔧 Available Scripts
+
+```bash
+# Development
+npm run dev          # Start development server
+
+# Production
+npm run build        # Build for production
+npm start           # Start production server
+
+# Code Quality
+npm run lint        # Run ESLint
+```
+
+## 🤖 AI Model Integration
+
+The application includes a pre-trained TensorFlow.js model located in `Public/my_model/` for intelligent complaint categorization:
+
+- **Model Files**: `model.json`, `weights.bin`, `metadata.json`
+- **Integration**: Seamless browser-based inference
+- **Capabilities**: Real-time image classification and complaint categorization
+
+## 🏗️ System Architecture & Workflows
+
+### System Workflow
+![System Workflow](docs/Workflow.png)
+
+*Complete system workflow showing the interaction between different user roles and system components*
+
+### API Workflow
+![API Workflow](docs/API-workflow.png)
+
+*Detailed API workflow diagram illustrating the backend processes and data flow*
+
+## 🔐 Authentication Flow
+
+The app supports multiple authentication methods:
+- Email/Password authentication
+- Google OAuth integration
+- Role-based access control
+- Secure session management
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Cross-platform compatibility
+- Progressive Web App (PWA) ready
+- Optimized for various screen sizes
+
+## 🚀 Quick Start Guide
+
+### For Development Team:
+1. Clone the repository
+2. Navigate to `Code/` directory
+3. Copy `.env.example` to `.env.local`
+4. Set up Firebase configuration
+5. Run `npm install` and `npm run dev`
+
+### For Users:
+- Access different modules based on your role:
+  - **Users**: `/user/signin` - General public interface
+  - **Traders**: `/trader/signin` - Marketplace access
+  - **MCD**: `/mcd/signin` - Municipal services
+  - **Admin**: `/admin/signin` - Administrative panel
+
+## 🔧 Troubleshooting
+
+If you encounter permission issues during installation:
+```bash
+sudo npm install
+sudo npm run dev
+```
+
+For Firebase configuration issues:
+1. Ensure all environment variables are properly set
+2. Verify Firebase project permissions
+3. Check Firebase rules for database access
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+Built with ❤️ by Team Tree.io for Smart India Hackathon
